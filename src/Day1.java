@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DayOne extends CodeDay {
+public class Day1 extends CodeDay {
     @Override
     public void puzzleOne() {
         ArrayList<ArrayList<Integer>> values;
