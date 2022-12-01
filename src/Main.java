@@ -18,7 +18,6 @@ public class Main {
                     .map(e -> e.getFileName().toString())
                     .filter((e) -> e.endsWith(".java") && e.startsWith("Day"))
                     .map(e -> e.substring(0, e.length() - 5))
-                    .sorted(Comparator.reverseOrder())
                     .collect(Collectors.toCollection(ArrayList::new));
 
         } catch (IOException e) {
