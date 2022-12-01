@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,9 +7,9 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final int day = 1;
-    private static final int puzzle = 1;
+    private static final int puzzle = 2;
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Path path = Path.of("./src/");
         ArrayList<String> files;
         try {
@@ -28,6 +27,7 @@ public class Main {
             CodeDay dayObject = (CodeDay) Class.forName(files.get(day - 1)).newInstance();
             dayObject.run(puzzle);
         } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
             System.out.println("Day " + day + " does not have a class");
         }
     }
