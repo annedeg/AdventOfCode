@@ -3,6 +3,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -17,6 +18,7 @@ public class Main {
                     .map(e -> e.getFileName().toString())
                     .filter((e) -> e.endsWith(".java") && e.startsWith("Day"))
                     .map(e -> e.substring(0, e.length() - 5))
+                    .sorted(Comparator.reverseOrder())
                     .collect(Collectors.toCollection(ArrayList::new));
 
         } catch (IOException e) {
