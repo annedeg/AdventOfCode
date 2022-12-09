@@ -8,7 +8,9 @@ public class Directory implements Addable {
     public ArrayList<Addable> files = new ArrayList<>();
     public String name= null;
 
+
     public Directory(String name) {
+
         this.name = name;
     }
 
@@ -48,11 +50,17 @@ public class Directory implements Addable {
 
     @Override
     public String toString() {
-        if (this.getSize() < 572957)
+        if (this.getSize() <= 4965705)
             return "";
-        return "Directory{595973" +
+        return "Directory{" +
+                "" + this.name + "" +
                 ", totalSize='" + this.getSize() + '\'' +
                 ", dicts=" + this.getAllDict() +
                 "}\n";
     }
 }
+//"44965705"
+//"5883165"
+//"6483228"
+//"44965705"
+//"11915402"

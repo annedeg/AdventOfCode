@@ -103,7 +103,7 @@ public class Day7 extends CodeDay {
         }
 
         int target = -(70000000 - 30000000 - main.getSize());
-        System.out.println(target);
+        System.out.println("target" + target);
         System.out.println(main.toString());
     }
 

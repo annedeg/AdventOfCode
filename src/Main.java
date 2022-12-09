@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class Main {
-    private static final int day = 7;
+    private static final int day = 9;
     private static final int puzzle = 2;
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
