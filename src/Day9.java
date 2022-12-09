@@ -1,5 +1,4 @@
 import helpers.Helper;
-import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,29 +66,45 @@ public class Day9 extends CodeDay {
 
             t = setAllTails(h, prevh, t);
 
-            int map[][] = new int[50][50];
-
-            int c = 1;
-            for (var ti : t) {
-                map[ti.x+25][ti.y+25] = c;
-                c+=1;
-            }
-            map[h.x+25][h.y+25] = 1;
-
-            for (int x = 0; x < map.length; x++) {
-                for (int y = 0; y < map.length; y++) {
-                    System.out.print((map[y][x] >= 1) ? map[y][x] : ".");
-                }
-                System.out.println();
-            }
-            System.out.println();
-            System.out.println();
-//            System.out.println(h);
-//            System.out.println(t + "\n");
-
-            positions.add(t.get(0));
+//            printboard(t,h);
+            positions.add(t.get(8));
         }
+
         return new Object[]{h, t, positions};
+    }
+
+    private void printboard(ArrayList<Position> t, Position h) {
+        int map[][] = new int[10][10];
+
+        int c = 9;
+        for (var ti : t) {
+            map[ti.x+3][ti.y+5] = c;
+            c-=1;
+        }
+        map[h.x+3][h.y+5] = -1;
+
+        for (int x = 0; x < map.length; x++) {
+            var amounttoprint = 0;
+            var str = new StringBuilder();
+            for (int[] ints : map) {
+                if (ints[x] != 0) {
+                    amounttoprint += 1;
+                    if (ints[x] == -1) {
+                        str.append("H");
+                    } else {
+                        str.append(ints[x]);
+                    }
+                } else {
+                    str.append(".");
+                }
+            }
+//            if (amounttoprint > 0) {
+                System.out.println(str);
+//            }
+
+        }
+        System.out.println();
+        System.out.println();
     }
 
 
@@ -105,30 +120,51 @@ public class Day9 extends CodeDay {
     }
 
     public ArrayList<Position> setAllTails(Position h, Position prevh, ArrayList<Position> t) {
-        for (int i = 0; i < t.size()-1; i++) {
+        for (int i = 0; i <= t.size()-1; i++) {
             int yc = (h.y - t.get(i).y);
             int xc = (h.x - t.get(i).x);
             if (Math.abs(yc) > 1 || Math.abs(xc) > 1) {
-                if (yc > 1 && Math.abs(xc) <= 1)
-                    //up
-                    t.set(i, stepTail(h, prevh, t.get(i)));
-                if (yc < -1 && Math.abs(xc) <= 1)
-                    //up
-                    t.set(i, stepTail(h, prevh, t.get(i)));
-                if (Math.abs(yc) <= 1 && xc > 1)
-                    //up
-                    t.set(i, stepTail(h, prevh, t.get(i)));
-                if (Math.abs(yc) <= 1 && xc < -1)
-                    //up
-                    t.set(i, stepTail(h, prevh, t.get(i)));
-                if (yc > 1 && xc > 1)
-                    //up
-                    t.set(i, new Position(t.get(i).x+1, t.get(i).y + 1));
-                if (yc < -1 && xc < -1)
-                    //up
-                    t.set(i, new Position(t.get(i).x - 1, t.get(i).y - 1));
+                if (xc == 0 && yc > 1) {
+                    t.set(i, new Position(t.get(i).x, t.get(i).y + 1));
+                }
+                if (xc == 0 && yc < -1) {
+                    t.set(i, new Position(t.get(i).x, t.get(i).y - 1));
+                }
+                if (yc == 0 && xc > 1) {
+                    t.set(i, new Position(t.get(i).x + 1, t.get(i).y));
+                }
+                if (yc == 0 && xc < -1) {
+                    t.set(i, new Position(t.get(i).x - 1, t.get(i).y));
+                }
+
+                if (Math.abs(xc) == 1 && yc > 1) {
+                    t.set(i, new Position(h.x, t.get(i).y + 1));
+                }
+                if (Math.abs(xc) == 1 && yc < -1) {
+                    t.set(i, new Position(h.x, t.get(i).y - 1));
+                }
+                if (Math.abs(yc) == 1 && xc > 1) {
+                    t.set(i, new Position(t.get(i).x + 1, h.y));
+                }
+                if (Math.abs(yc) == 1 && xc < -1) {
+                    t.set(i, new Position(t.get(i).x - 1, h.y));
+                }
+                if (yc == 2 && xc == 2) {
+                    t.set(i, new Position(t.get(i).x - 1, t.get(i).x - 1));
+                }
+
+                if (yc == -2 && xc == -2) {
+                    t.set(i, new Position(t.get(i).x + 1, t.get(i).y + 1));
+                }
+
+                if (yc == -2 && xc == 2) {
+                    t.set(i, new Position(t.get(i).x + 1, t.get(i).y - 1));
+                }
+
+                if (yc == 2 && xc == -2) {
+                    t.set(i, new Position(t.get(i).x - 1, t.get(i).y + 1));
+                }
             }
-            prevh = h;
             h = t.get(i);
         }
 
@@ -147,14 +183,14 @@ public class Day9 extends CodeDay {
         }
 
         var allLocations = new ArrayList<Position>();
-        allLocations.add(t.get(0));
+        allLocations.add(t.get(8));
         for (var c : input) {
             var spl = c.split(" ");
             var res = stepHeadTwo(spl[0], Integer.parseInt(spl[1]), h, t, allLocations);
             h = (Position) res[0];
             t = (ArrayList<Position>) res[1];
             allLocations = (ArrayList<Position>) res[2];
-            allLocations.add(t.get(0));
+            allLocations.add(t.get(8));
         }
 
 //        allLocations.forEach(System.out::println);
