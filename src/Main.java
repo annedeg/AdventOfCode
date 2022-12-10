@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class Main {
-    private static final int day = 9;
+    private static final int day = 10;
     private static final int puzzle = 2;
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -18,6 +18,7 @@ public class Main {
                     .map(e -> e.getFileName().toString())
                     .filter((e) -> e.endsWith(".java") && e.startsWith("Day"))
                     .map(e -> e.substring(0, e.length() - 5))
+                    .sorted(Comparator.comparingInt(a -> Integer.parseInt(a.split("Day")[1])))
                     .collect(Collectors.toCollection(ArrayList::new));
 
         } catch (IOException e) {
