@@ -7,8 +7,8 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class Main {
-    private static final int day = 10;
-    private static final int puzzle = 2;
+    private static final int day = 12;
+    private static final int puzzle = 1;
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Path path = Path.of("./src/");
