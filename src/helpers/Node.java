@@ -4,11 +4,17 @@ public class Node {
     double g, h;
     int x, y;
     Node parent = null;
-    Node(int x, int y, double g, double h) {
+    char val;
+    public Node(int x, int y, double g, double h) {
         this.x = x;
         this.y = y;
         this.g = g;
         this.h = h;
+    }
+
+
+    public void setVal(char val) {
+        this.val = val;
     }
 
     public double getG() {
@@ -61,11 +67,9 @@ public class Node {
     @Override
     public String toString() {
         return "Node{" +
-                "g=" + g +
-                ", h=" + h +
                 ", x=" + x +
                 ", y=" + y +
-                ", parent=" + parent +
+                ", v=" + val +
                 '}';
     }
 }

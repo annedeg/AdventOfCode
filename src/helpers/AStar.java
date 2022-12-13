@@ -28,11 +28,12 @@ public class AStar extends AIController {
 
     @Override
     public void start() {
-        Node result = getShortestPath();
+//        Node result = getShortestPath();
     }
 
     @Override
-    public Node getShortestPath() {
+    public Node getShortestPath(Node startNode) {
+        this.startNode = startNode;
         ArrayList<Node> openList = new ArrayList<Node>();
         ArrayList<Node> closedList = new ArrayList<Node>();
         openList.add(this.startNode);
@@ -46,7 +47,7 @@ public class AStar extends AIController {
                 }
                 int index = inListIndex(openList, successor);
                 if(index != -1) {
-                    if(openList.get(index).getF() < successor.getF())
+                    if(openList.get(index).getF() <= successor.getF())
                         continue;
                 }
 
@@ -57,7 +58,8 @@ public class AStar extends AIController {
             }
             closedList.add(q);
         }
-        return closedList.get(closedList.size()-1);
+
+        return null;
     }
 
     @Override
@@ -82,17 +84,16 @@ public class AStar extends AIController {
     private ArrayList<Node> generateSuccessors(Node middleNode) {
         ArrayList<Node> successors = new ArrayList<>();
         int counter = 0;
+
         for(int x = (middleNode.getX() -1); x < middleNode.getX()+2; x++) {
             for(int y = (middleNode.getY() -1); y < middleNode.getY()+2; y++) {
-                if(isUsable(x,y) && counter != 4) {
+                if(isUsable(x,y) && counter != 4 && counter != 0 && counter != 2 && counter != 6 && counter != 8 && notHigh(x,y,middleNode)) {
+                    if (x == middleNode.getX() && y == middleNode.getY())
+                        continue;
                     double h = generateH(x, y);
-                    double g = generateCurrG(middleNode);
-                    if(counter == 0 || counter == 2 || counter == 6 || counter == 8) {
-                        g += Math.sqrt(2);
-                    } else {
-                        g += 1;
-                    }
+                    double g = generateCurrG(middleNode) + 1;
                     Node node = new Node(x,y,g,h);
+                    node.setVal(this.graph[x][y]);
                     node.setParent(middleNode);
                     successors.add(node);
                 }
@@ -104,28 +105,26 @@ public class AStar extends AIController {
 
     private boolean notHigh(int x,int y, Node middleNode) {
         var middelVal = this.graph[middleNode.getX()][middleNode.getY()];
+        var newVal = this.graph[x][y];
         if (middelVal == 'S') {
             middelVal = 'a'-1;
         } else if (middelVal == 'E') {
             middelVal = 'z'+1;
         }
-        return (this.graph[x][y] - middelVal) == 1;
+
+        if (newVal == 'S') {
+            newVal = 'a'-1;
+        } else if (newVal == 'E') {
+            newVal = 'z'+1;
+        }
+
+        var steepness = newVal - middelVal;
+
+        return (steepness) == 1 || (steepness) == 0 || (steepness) < 0;
     }
 
     private double generateH(int currX, int currY) {
-        boolean wasNegative = false;
-        int difx = this.endNode.getX()- currX;
-        int dify = this.endNode.getY()- currY;
-        int total = dify+difx;
-        if(total < 0) {
-            wasNegative = true;
-            total *= -1;
-        }
-        double result = Math.sqrt(total);
-        if(wasNegative) {
-            result = -result;
-        }
-        return result;
+        return Math.abs(currX-this.endNode.getX()) + Math.abs(currY-this.endNode.getY());
     }
 
     private double generateCurrG(Node curr) {
