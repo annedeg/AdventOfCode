@@ -1,9 +1,11 @@
 import helpers.Helper;
 
+import helpers.Position;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 
 public class Day9 extends CodeDay {
     @Override
@@ -202,32 +204,3 @@ public class Day9 extends CodeDay {
     }
 }
 
-class Position {
-    final int x;
-    final int y;
-
-    Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Position position)) return false;
-        return x == position.x && y == position.y;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
-    }
-
-    @Override
-    public String toString() {
-        return "Position{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
-    }
-}
