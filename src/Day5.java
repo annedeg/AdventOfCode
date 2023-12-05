@@ -1,103 +1,145 @@
 import helpers.Helper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class Day5 extends CodeDay {
     @Override
     public void puzzleOne() {
-//[H]                 [Z]         [J]
-//[L]     [W] [B]     [G]         [R]
-//[R]     [G] [S]     [J] [H]     [Q]
-//[F]     [N] [T] [J] [P] [R]     [F]
-//[B]     [C] [M] [R] [Q] [F] [G] [P]
-//[C] [D] [F] [D] [D] [D] [T] [M] [G]
-//[J] [C] [J] [J] [C] [L] [Z] [V] [B]
-//[M] [Z] [H] [P] [N] [W] [P] [L] [C]
-// 1   2   3   4   5   6   7   8   9
-        ArrayList<LinkedList<Character>> crates = new ArrayList<>();
-        crates.add(new LinkedList<Character>(Arrays.asList('M', 'J', 'C', 'B', 'F', 'R', 'L', 'H')));
-        crates.add(new LinkedList<Character>(Arrays.asList('Z', 'C', 'D')));
-        crates.add(new LinkedList<Character>(Arrays.asList('H', 'J', 'F', 'C', 'N', 'G', 'W')));
-        crates.add(new LinkedList<Character>(Arrays.asList('P', 'J', 'D', 'M', 'T', 'S', 'B')));
-        crates.add(new LinkedList<Character>(Arrays.asList('N', 'C', 'D', 'R', 'J')));
-        crates.add(new LinkedList<Character>(Arrays.asList('W', 'L', 'D', 'Q', 'P', 'J', 'G', 'Z')));
-        crates.add(new LinkedList<Character>(Arrays.asList('P', 'Z', 'T', 'F', 'R', 'H')));
-        crates.add(new LinkedList<Character>(Arrays.asList('L', 'V', 'M', 'G')));
-        crates.add(new LinkedList<Character>(Arrays.asList('C', 'B', 'G', 'P', 'F', 'Q', 'R', 'J')));
-//        crates.add(new LinkedList<>(Arrays.asList('Z', 'N')));
-//        crates.add(new LinkedList<>(Arrays.asList('M', 'C', 'D')));
-//        crates.add(new LinkedList<>(List.of('P')));
+        ArrayList<String> values = Helper.readToStringArrayList("src/input/dayfive.txt");
 
+        long[] seeds = Arrays.stream(values.get(0).split(": ")[1].split(" ")).mapToLong(Long::parseUnsignedLong).toArray();
 
+        ArrayList<String> collect = values.stream().skip(1).collect(Collectors.toCollection(ArrayList::new));
 
-        var input = Helper.readToStringArrayList("src/input/dayfive.txt");
-        System.out.println(crates);
-        for (var line : input) {
-            var res = line.split(" ");
-            var amount = Integer.parseInt(res[1]);
-            var from = Integer.parseInt(res[3]) - 1;
-            var to = Integer.parseInt(res[5]) - 1;
+        ArrayList<ArrayList<String>> groupedValues = new ArrayList<>();
 
-            for (int i = 0; i < amount; i++) {
-                crates.get(to).addLast(crates.get(from).removeLast());
+        int i = -1;
+        for (String line : collect) {
+            if (line.equals("")) {
+                i+=1;
+                groupedValues.add(new ArrayList<>());
+                continue;
             }
 
-            System.out.println(crates);
+            if (line.contains(":")) {
+                continue;
+            }
 
+            groupedValues.get(i).add(line);
         }
 
+        ArrayList<SpecialMapper> specialMappers = groupedValues.stream()
+            .map(SpecialMapper::new)
+            .collect(Collectors.toCollection(ArrayList::new));
 
-        for (int i = 0; i < crates.size(); i++) {
-            System.out.print(crates.get(i).getLast());
+        long min = Long.MAX_VALUE;
+        for (long seed : seeds) {
+
+            for (SpecialMapper specialMapper : specialMappers) {
+                seed = specialMapper.getDestination(seed);
+            }
+
+            if (seed < min) {
+                min = seed;
+            }
         }
+
+        System.out.println(min);
     }
 
     @Override
     public void puzzleTwo() {
-        var input = Helper.readToStringArrayList("src/input/dayfive.txt");
-        ArrayList<LinkedList<Character>> crates = new ArrayList<>();
-        crates.add(new LinkedList<Character>(Arrays.asList('M', 'J', 'C', 'B', 'F', 'R', 'L', 'H')));
-        crates.add(new LinkedList<Character>(Arrays.asList('Z', 'C', 'D')));
-        crates.add(new LinkedList<Character>(Arrays.asList('H', 'J', 'F', 'C', 'N', 'G', 'W')));
-        crates.add(new LinkedList<Character>(Arrays.asList('P', 'J', 'D', 'M', 'T', 'S', 'B')));
-        crates.add(new LinkedList<Character>(Arrays.asList('N', 'C', 'D', 'R', 'J')));
-        crates.add(new LinkedList<Character>(Arrays.asList('W', 'L', 'D', 'Q', 'P', 'J', 'G', 'Z')));
-        crates.add(new LinkedList<Character>(Arrays.asList('P', 'Z', 'T', 'F', 'R', 'H')));
-        crates.add(new LinkedList<Character>(Arrays.asList('L', 'V', 'M', 'G')));
-        crates.add(new LinkedList<Character>(Arrays.asList('C', 'B', 'G', 'P', 'F', 'Q', 'R', 'J')));
-//        crates.add(new LinkedList<>(Arrays.asList('Z', 'N')));
-//        crates.add(new LinkedList<>(Arrays.asList('M', 'C', 'D')));
-//        crates.add(new LinkedList<>(List.of('P')));
+        ArrayList<String> values = Helper.readToStringArrayList("src/input/dayfive.txt");
+        ArrayList<String> collect = values.stream().skip(1).collect(Collectors.toCollection(ArrayList::new));
 
+        ArrayList<ArrayList<String>> groupedValues = new ArrayList<>();
 
-        System.out.println(crates);
-        for (var line : input) {
-            var res = line.split(" ");
-            var amount = Integer.parseInt(res[1]);
-            var from = Integer.parseInt(res[3]) - 1;
-            var to = Integer.parseInt(res[5]) - 1;
-
-            ArrayList<Character> remember = new ArrayList<>();
-            for (int i = 0; i < amount; i++) {
-                remember.add(crates.get(from).removeLast());
+        int i = -1;
+        for (String line : collect) {
+            if (line.equals("")) {
+                i+=1;
+                groupedValues.add(new ArrayList<>());
+                continue;
             }
 
-            for (int i = remember.size() - 1; i >= 0; i--) {
-                crates.get(to).addLast(remember.get(i));
+            if (line.contains(":")) {
+                continue;
             }
 
-            System.out.println(crates);
-
+            groupedValues.get(i).add(line);
         }
 
+        ArrayList<SpecialMapper> specialMappers = groupedValues.stream()
+            .map(SpecialMapper::new)
+            .collect(Collectors.toCollection(ArrayList::new));
 
-        for (int i = 0; i < crates.size(); i++) {
-            System.out.print(crates.get(i).getLast());
+        ArrayList<Long> lowest = new ArrayList<>();
+
+        long[] seeds = Arrays.stream(values.get(0).split(": ")[1].split(" ")).mapToLong(Long::parseUnsignedLong).toArray();
+        ArrayList<Long> checked = new ArrayList<>();
+
+        ExecutorService executors = Executors.newFixedThreadPool(10);
+        for (int iz = 0; iz < seeds.length; iz+=2) {
+            System.out.println(iz + "/" + seeds.length);
+
+            long start = seeds[iz];
+            long length = seeds[iz+1];
+
+            executors.submit(() -> {
+                long min = Long.MAX_VALUE;
+                for (long seed : LongStream.range(start, start + length).toArray()) {
+                    if (checked.contains(seed)) {
+                        continue;
+                    }
+
+                    for (SpecialMapper specialMapper : specialMappers) {
+                        seed = specialMapper.getDestination(seed);
+                    }
+
+                    checked.add(seed);
+                    if (seed < min) {
+                        min = seed;
+                    }
+                }
+                System.out.println(min);
+            });
         }
     }
 
+    class SpecialMapper {
+        private ArrayList<Long> starts = new ArrayList<>();
+        private ArrayList<Long> ends = new ArrayList<>();
+        private ArrayList<Long> diffs = new ArrayList<>();
+
+        public SpecialMapper(ArrayList<String> values) {
+            for (String value : values) {
+                String[] strings = value.split(" ");
+                long sourceRangeStart = Long.parseUnsignedLong(strings[1]);
+                long destinationRangeStart = Long.parseUnsignedLong(strings[0]);
+                long rangeLength = Long.parseUnsignedLong(strings[2]);
+
+                diffs.add(destinationRangeStart - sourceRangeStart);
+                starts.add(sourceRangeStart);
+                ends.add(sourceRangeStart+rangeLength);
+            }
+        }
+
+        public long getDestination(long source) {
+            for (int i = 0; i < diffs.size(); i++) {
+                if (source >= starts.get(i) && source <= ends.get(i)) {
+                    return source + diffs.get(i);
+                }
+            }
+
+            return source;
+        }
+    }
   }
