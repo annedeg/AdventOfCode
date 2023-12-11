@@ -1,125 +1,196 @@
 import helpers.Helper;
 
+import java.awt.*;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day11 extends CodeDay {
     @Override
     public void puzzleOne() {
-        var input = Helper.readToString("src/input/day11");
-        var monkeys = new ArrayList<Monkey>();
-        for (var monkey : input.split("\n\n")) {
-            monkeys.add(new Monkey(monkey));
-        }
+        var input = Helper.readToStringArrayList("src/input/day11");
 
-        for (int round = 0; round < 20; round++) {
-            for (var monkey : monkeys) {
-                for (var item : monkey.items) {
-                    var newItem = monkey.doBored(monkey.doOperation(item));
-                    var location = monkey.test(newItem);
-                    monkeys.get(location).addItem(newItem);
-                    monkey.items.remove(item);
-                }
-            }
-        }
-
-        monkeys.sort((a,b) -> b.totalInspected - a.totalInspected);
-        System.out.println(monkeys.get(0).totalInspected * monkeys.get(1).totalInspected);
+        new Image(input, 1);
     }
 
     @Override
     public void puzzleTwo() {
-        var input = Helper.readToString("src/input/day11");
-        var monkeys = new ArrayList<Monkey>();
-        var superModule = 1;
-        for (var monkey : input.split("\n\n")) {
-            var newMonkey = new Monkey(monkey);
-            monkeys.add(newMonkey);
-            superModule *= newMonkey.test;
+        var input = Helper.readToStringArrayList("src/input/day11");
+        new Image(input, 1000000);
+    }
+
+    public class Image {
+        char[][] image;
+
+        public Image(ArrayList<String> input, int emptyAmount) {
+            image = new char[input.size()][input.get(0).length()];
+            int y = 0;
+            for (String inputRow : input) {
+                int x = 0;
+                for (char inputChar : inputRow.toCharArray()) {
+                    image[y][x] = inputChar;
+                    x+=1;
+                }
+                y+=1;
+            }
+
+            ArrayList<Pair> allPairs = expandSpaceAndGetPairs(image, emptyAmount);
+            long sum = allPairs.stream().map(Pair::getDistance).mapToLong(x -> x).sum();
+            System.out.println(sum);
         }
 
+        public ArrayList<Pair> expandSpaceAndGetPairs(char[][] image, int emptyAmount) {
+            ArrayList<Pair> allPairs = getAllPairs(image);
+            ArrayList<Pair> newPairs = new ArrayList<>();
+            emptyAmount -= 1;
+            for (Pair pair : allPairs) {
+                ArrayList<Long> emptyRows = getAllEmptyRows();
+                ArrayList<Long> allEmptyColumns = getAllEmptyColumns();
 
-        for (int round = 0; round < 10000; round++) {
-            for (var monkey : monkeys) {
-                for (var item : monkey.items) {
-                    var newItem = monkey.doOperation(item);
-                    var location = monkey.test(newItem);
-                    monkeys.get(location).addItem(newItem.mod(new BigInteger(String.valueOf(superModule))));
-                    monkey.items.remove(item);
+                Location one = pair.one;
+                Location two = pair.two;
+
+                long newOneX = one.x + (amountFound(one.x, emptyRows) * emptyAmount);
+                long newOneY = one.y + (amountFound(one.y, allEmptyColumns) * emptyAmount);
+                long newTwoX = two.x + (amountFound(two.x, emptyRows) * emptyAmount);
+                long newTwoY = two.y + (amountFound(two.y, allEmptyColumns) * emptyAmount);
+
+                newPairs.add(new Pair(new Location(newOneX, newOneY), new Location(newTwoX, newTwoY)));
+            }
+
+            return newPairs;
+        }
+
+        private long amountFound(Long old, ArrayList<Long> list) {
+            return list.stream().filter(i -> old >= i).count();
+        }
+
+        private ArrayList<Long> getAllEmptyRows() {
+            ArrayList<Long> emptyRows = new ArrayList<>();
+            for (int x = 0; x < image.length; x++) {
+                boolean rowEmpty = true;
+                for (int y = 0; y < image[0].length; y++) {
+                    if (image[x][y] == '#') {
+                        rowEmpty = false;
+                    }
+                }
+
+                if (rowEmpty) {
+                    emptyRows.add((long) x);
                 }
             }
+
+            return emptyRows;
         }
 
-        monkeys.sort((a,b) -> b.totalInspected - a.totalInspected);
-        System.out.println(new BigInteger(String.valueOf(monkeys.get(0).totalInspected)).multiply(new BigInteger(String.valueOf(monkeys.get(1).totalInspected))));
-    }
-}
+        private ArrayList<Long> getAllEmptyColumns() {
+            ArrayList<Long> emptyColumns = new ArrayList<>();
+            for (int y = 0; y < image[0].length; y++) {
+                boolean columnEmpty = true;
+                for (int x = 0; x < image.length; x++) {
+                    if (image[x][y] == '#') {
+                        columnEmpty = false;
+                    }
+                }
 
-class Monkey {
-    String operation;
-    int test;
-    int toTrue;
-    int toFalse;
-    CopyOnWriteArrayList<BigInteger> items;
-    int totalInspected = 0;
+                if (columnEmpty) {
+                    emptyColumns.add((long) y);
+                }
+            }
 
-    Monkey(String inputPart) {
-        var rows = inputPart.split("\n");
-        var items = rows[1].split("Starting items: ")[1].split(", ");
-        this.items = new CopyOnWriteArrayList<BigInteger>();
-        for (var item : items) {
-            this.items.add(new BigInteger(item));
+            return emptyColumns;
         }
-        this.operation = rows[2].split("Operation: ")[1];
-        this.test = Integer.parseInt(rows[3].split(" by ")[1]);
-        this.toTrue = Integer.parseInt(rows[4].split("If true: throw to monkey ")[1]);
-        this.toFalse = Integer.parseInt(rows[5].split("If false: throw to monkey ")[1]);
-    }
 
-    public String items() {
-        var sb = new StringBuilder("Monkey: ");
-        for (var item : this.items) {
-            sb.append(item);
+        private ArrayList<Pair> getAllPairs(char[][] image) {
+            ArrayList<Location> locations = new ArrayList<>();
+            for (int x = 0; x < image.length; x++) {
+                for (int y = 0; y < image[0].length; y++) {
+                    char ch = image[x][y];
+
+                    if (ch == '#') {
+                        locations.add(new Location(x, y));
+                    }
+                }
+            }
+
+            ArrayList<Pair> pairs = new ArrayList<>();
+            for (Location location : locations) {
+                for (Location location2 : locations) {
+                    if (location.equals(location2)) {
+                        continue;
+                    }
+
+                    Pair pair = new Pair(location, location2);
+                    if (pairs.contains(pair)) {
+                        continue;
+                    }
+
+                    pairs.add(pair);
+                }
+            }
+
+            return pairs;
         }
-        return sb.toString();
     }
 
-    @Override
-    public String toString() {
-        return "Monkey inspected items " + this.totalInspected + " times.";
+    class Pair {
+        public final Location one;
+        public final Location two;
+        Pair(Location one, Location two) {
+            this.one = one;
+            this.two = two;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Pair pair = (Pair) o;
+            return (Objects.equals(one, pair.one) && Objects.equals(two, pair.two)) || (Objects.equals(one, pair.two) && Objects.equals(two, pair.one));
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(one, two);
+        }
+
+        public long getDistance() {
+            return Math.abs(one.x - two.x) + Math.abs(one.y - two.y);
+        }
     }
 
-    public void addItem(BigInteger item) {
-        this.items.add(item);
-    }
+    class Location {
+        public final long x;
+        public final long y;
 
-    public BigInteger doOperation(BigInteger item) {
-        this.totalInspected += 1;
-        var splitter = this.operation.split("new = ")[1].split(" ");;
+        Location(long x, long y) {
+            this.x = x;
+            this.y = y;
+        }
 
-        BigInteger var1;
-        BigInteger var2;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Location location = (Location) o;
+            return x == location.x && y == location.y;
+        }
 
-        var1 = (splitter[0].contains("old")) ? item : new BigInteger(splitter[0]);
-        var2 = (splitter[2].contains("old")) ? item : new BigInteger(splitter[2]);
-        BigInteger total = new BigInteger("0");
-        if (splitter[1].contains("+"))
-            total = var1.add(var2);
-        else if (splitter[1].contains("*"))
-            total = var1.multiply(var2);
-
-        return total;
-    }
-
-    public BigInteger doBored(BigInteger item) {
-        return (item.divide(new BigInteger("3")));
-    }
-
-    public int test(BigInteger item) {
-        return item.mod(new BigInteger(String.valueOf(this.test))).equals(new BigInteger("0")) ? toTrue : toFalse;
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
     }
 }
