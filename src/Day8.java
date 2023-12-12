@@ -52,6 +52,7 @@ public class Day8 extends CodeDay {
 
     @Override
     public void puzzleTwo() {
+        //sodoku achtig, met eerst eerste character, dan tweede etc
         var input = Helper.readToStringArrayList("src/input/dayeight.txt");
         String moves = input.get(0);
         List<String> sequence = input.subList(2, input.size());
