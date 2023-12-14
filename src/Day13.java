@@ -44,30 +44,31 @@ public class Day13 extends CodeDay {
         return findAmountAboveReflectionLocation(matrix, -1);
     }
     public int findAmountAboveReflectionLocation(char[][] matrix, int prev) {
-        int amount = findReflectionLocation(matrix, prev);
-        if (amount == -1 || prev == amount) {
-            amount = findReflectionLocation(rotate(matrix), prev);
-            if (amount == -1) {
-                return -1;
-            }
+        int amount = findReflectionLocation(matrix, prev, true);
+        if (amount == -1) {
+            amount = findReflectionLocation(rotate(matrix), prev , false);
             return amount;
         }
 
+        return amount;
 
-        return amount * 100;
     }
 
-    public int findReflectionLocation(char[][] matrix, int prev) {
+    public int findReflectionLocation(char[][] matrix, int prev, boolean gr) {
         int l = matrix.length;
         int h = (int) Math.floor(l / 2);
 
         for (int i = 0; i <= l; i++) {
-            if (confirmLocation(h + i, matrix) && ((h + i) + 1) != prev) {
-                return (h + i) + 1;
+
+            int min = ((h + i) + 1) * (gr ? 100 : 1);
+
+            if (confirmLocation(h + i, matrix) && min != prev) {
+                return min;
             }
 
-            if (confirmLocation(h - i, matrix) && ((h - i) + 1) != prev) {
-                return (h - i) + 1;
+            int max = ((h - i) + 1) * (gr ? 100 : 1);
+            if (confirmLocation(h - i, matrix) && max != prev) {
+                return max;
             }
         }
 
@@ -120,6 +121,7 @@ public class Day13 extends CodeDay {
             .map(this::createMatrix)
             .collect(Collectors.toCollection(ArrayList::new));
 
+        int c = 0;
         for (char[][] m : charMatrixes) {
             int amNormal = findAmountAboveReflectionLocation(m);
             ArrayList<char[][]> allAltMatrixes = createAllAltMatrixes(m);
