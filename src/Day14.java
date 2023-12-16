@@ -91,7 +91,9 @@ public class Day14 extends CodeDay {
                 .toArray(size -> new char[size][input.size()]);
 
         int first = 0;
-        for (int i = 0; i < 1000000000; i++) {
+        ArrayList<Integer> val = new ArrayList<>();
+        int toStop = 1_000_000_000;
+        for (int i = 0; i < 1_000_000_000; i++) {
             if (i % 100000 == 0 && i != 0) {
                 System.out.println("at " + i + "/" + 1000000000 + " ()" + ((i / 1000000000L) * 100L));
             }
@@ -100,33 +102,52 @@ public class Day14 extends CodeDay {
 
             if (cache.containsKey(hashCode) && first == 0) {
                 first = i;
-                System.out.println(first);
             }
 
             if (cache.containsKey(hashCode) && first != 0) {
-                array = cache.get(hashCode);
-                if (i <= (1000000000 - ((cache.size()) * 1000))) {
-                    i += ((cache.size()) * 10);
-                }
-                continue;
+//                array = cache.get(hashCode);
+                toStop = (first + ((1000000000 - first) % 10));
+//                if (i <= (1000000000 - ((cache.size()) * 1000))) {
+//                    i += ((cache.size()) * 10);
+//                }
+//                continue;
             }
 
             array = doCycle(array);
-            cache.put(hashCode, array);
-        }
 
-        long total = 0;
-        int w = array.length;
-        for (int x = 0; x < array.length; x++) {
-            for (int y = 0; y < array[0].length; y++) {
-                if (array[x][y] == 'O') {
-                    total += w;
+            int total = 0;
+            int w = array.length;
+            for (int x = 0; x < array.length; x++) {
+                for (int y = 0; y < array[0].length; y++) {
+                    if (array[x][y] == 'O') {
+                        total += w;
+                    }
                 }
+
+                w--;
             }
 
-            w--;
+            if (val.contains(total) && first != 0) {
+                System.out.println("nm");
+            }
+            val.add(total);
+
+            cache.put(hashCode, array);
+
         }
-        System.out.println(total);
+
+//        long total = 0;
+//        int w = array.length;
+//        for (int x = 0; x < array.length; x++) {
+//            for (int y = 0; y < array[0].length; y++) {
+//                if (array[x][y] == 'O') {
+//                    total += w;
+//                }
+//            }
+//
+//            w--;
+//        }
+//        System.out.println(total);
     }
 
     public char[][] doCycle(char[][] input) {
