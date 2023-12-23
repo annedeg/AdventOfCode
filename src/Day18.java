@@ -1,8 +1,6 @@
 import helpers.Helper;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
 
@@ -12,110 +10,55 @@ public class Day18 extends CodeDay {
     public void puzzleOne() {
         var input = Helper.readToStringArrayList("src/input/day18");
 
-        int maxX = 0;
-        int maxY = 0;
+        Location currentLocation = new Location(0, 0);
 
-        int minX = 0;
-        int minY = 0;
+        ArrayList<Trench> trenches = new ArrayList<>();
 
+        for (String line : input) {
+            Trench trench = new Trench(line, currentLocation, false);
+            trenches.add(trench);
+            currentLocation = trench.getEnd();
+        }
+
+        int sum1 = 0;
+        int sum2 = 0;
+        int length = 0;
+        for (Trench trench : trenches) {
+            sum1 += trench.location.x * trench.getEnd().y;
+            sum2 += trench.location.y * trench.getEnd().x;
+            length += trench.length;
+        }
+
+        int total = abs(sum1-sum2) / 2;
+        System.out.println((total + (length / 2) + 1));
+    }
+
+    @Override
+    public void puzzleTwo() {
+        var input = Helper.readToStringArrayList("src/input/day18");
 
         Location currentLocation = new Location(0, 0);
 
         ArrayList<Trench> trenches = new ArrayList<>();
 
         for (String line : input) {
-            Trench trench = new Trench(line, currentLocation);
+            Trench trench = new Trench(line, currentLocation, true);
             trenches.add(trench);
             currentLocation = trench.getEnd();
-
-            if (currentLocation.x > maxX) {
-                maxX = currentLocation.x;
-            }
-
-            if (currentLocation.x < minX) {
-                minX = currentLocation.x;
-            }
-
-            if (currentLocation.y > maxY) {
-                maxY = currentLocation.y;
-            }
-
-            if (currentLocation.y < minY) {
-                minY = currentLocation.y;
-            }
         }
 
-        int xmod = abs(minX);
-        int ymod = abs(minY);
-        char[][] matrix = new char[maxX + xmod+1][maxY + ymod+1];
-        currentLocation = new Location(0,0);
+        long sum1 = 0;
+        long sum2 = 0;
+        long length = 0;
         for (Trench trench : trenches) {
-            int startX = Math.min(currentLocation.x, trench.getEnd().x)+xmod;
-            int endX = Math.max(currentLocation.x, trench.getEnd().x)+xmod;
-
-            int startY = Math.min(currentLocation.y, trench.getEnd().y)+ymod;
-            int endY = Math.max(currentLocation.y, trench.getEnd().y)+ymod;
-
-            for (int x = startX; x <= endX; x++) {
-                for (int y = startY; y <= endY; y++) {
-                    matrix[x][y] = '#';
-                }
-            }
-
-            currentLocation = trench.getEnd();
+            sum1 += (long) trench.location.x * trench.getEnd().y;
+            sum2 += (long) trench.location.y * trench.getEnd().x;
+            length += trench.length;
         }
 
-        for (int x = 0; x < matrix.length; x++) {
-            for (int y = 0; y < matrix[0].length; y++) {
-                if (checkRow(matrix, new Location(x,y), trenches)) {
-                    matrix[x][y] = '/';
-                }
-            }
-        }
-
-        long count = Arrays.stream(matrix)
-                .map(String::new)
-                .map(str -> Arrays.stream(str.split("")).collect(Collectors.toCollection(ArrayList::new)))
-                .flatMap(ArrayList::stream)
-                .filter(str -> str.equals("#") || str.equals("/"))
-                .count();
-        System.out.println(count);
-    }
-
-    public boolean checkRow(char[][] matrix, Location location, ArrayList<Trench> trenches) {
-        boolean in = false;
-        for (int yc = 0; yc < matrix[0].length; yc++) {
-            if (yc+1 < matrix[0].length && matrix[location.x][yc] == '#' && matrix[location.x][yc + 1] == '#') {
-                continue;
-            }
-
-            if (matrix[location.x][yc] == '#') {
-                in = !in;
-                continue;
-            }
-
-            if (location.y == yc && matrix[location.x][location.y] == '\u0000') {
-                return in;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean inStartOrEndTrench(ArrayList<Trench> trenches, Location location) {
-        return trenches.stream()
-                .anyMatch(trench -> trench.inStartEndTrench(location));
-    }
-
-    public boolean inAnyTrench(ArrayList<Trench> trenches, Location location) {
-        return trenches.stream()
-                .anyMatch(trench -> trench.inTrench(location));
-    }
-
-    @Override
-    public void puzzleTwo() {
-        var input = Helper.readToStringArrayList("src/input/day17");
-
+        long total = abs(sum1-sum2) / 2;
+        System.out.println(total);
+        System.out.println((total + (length / 2) + 1));
     }
 
     enum Direction {
@@ -144,7 +87,7 @@ public class Day18 extends CodeDay {
         String color;
         int length;
 
-        Trench(String line, Location location) {
+        Trench(String line, Location location, boolean translateHex) {
             String[] split = line.split(" ");
             direction = switch (split[0]) {
                 case "U" -> Direction.UP;
@@ -158,18 +101,26 @@ public class Day18 extends CodeDay {
             this.length = Integer.parseInt(split[1]);
 
             color = split[2];
+
+            if (translateHex) {
+                this.length = Integer.parseInt(color.replaceAll("[#()]", "").substring(0, 5), 16);
+                int dir = (Integer.parseInt(color.replaceAll("[#()]", "").substring(5, 6), 16)) % 4;
+
+                this.direction = switch (dir) {
+                    case 0 -> Direction.RIGHT;
+                    case 1 -> Direction.DOWN;
+                    case 2 -> Direction.LEFT;
+                    case 3 -> Direction.UP;
+                    default -> throw new IllegalStateException("Unexpected value: " + split[0]);
+                };
+
+                System.out.println(length);
+                System.out.println(direction.name());
+            }
         }
 
         public Location getEnd() {
             return new Location(location.x + direction.getX() * length, location.y + direction.getY() * length);
-        }
-
-        public boolean inTrench(Location location) {
-            return this.location.x >= location.x && location.x <= getEnd().x && this.location.y >= location.y && location.y <= getEnd().y;
-        }
-
-        public boolean inStartEndTrench(Location location) {
-            return location.x == this.location.x && location.y == this.location.y || location.x == getEnd().x && location.y == getEnd().y;
         }
     }
 
