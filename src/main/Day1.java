@@ -1,14 +1,9 @@
-import helpers.Helper;
+package main;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
+import main.helpers.Helper;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Day1 {
     ArrayList<Integer> listOne;

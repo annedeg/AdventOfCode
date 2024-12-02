@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 
 public class MapModel extends Model {

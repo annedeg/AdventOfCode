@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 public class Node {
     double g, h;

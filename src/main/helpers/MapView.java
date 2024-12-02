@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 public class MapView extends View {
     private AIController controller;

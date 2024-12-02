@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 public interface Addable {
     void addFile(Addable file);

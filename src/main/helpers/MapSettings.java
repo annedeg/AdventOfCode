@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 public class MapSettings {
 //    public static int PASSABLE = 0;

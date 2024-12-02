@@ -1,4 +1,4 @@
-package helpers;
+package main.helpers;
 
 public abstract class AIController extends Controller {
     abstract public Node getShortestPath(Node startNode);
