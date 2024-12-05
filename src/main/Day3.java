@@ -33,19 +33,15 @@ public class Day3 {
         boolean disable = false;
         int total = 0;
         while (matcher.find()) {
-            if (matcher.group(0).contains("don't")) {
-                disable = true;
+            if (matcher.group(0).contains("do")) {
+                disable = !matcher.group(0).equals("do()");
                 continue;
             }
 
-            if (matcher.group(0).equals("do()")) {
-                disable = false;
+            if (disable) {
                 continue;
             }
-
-            if (!disable) {
-                total += Integer.parseInt(matcher.group(1)) * Integer.parseInt(matcher.group(2));
-            }
+            total += Integer.parseInt(matcher.group(1)) * Integer.parseInt(matcher.group(2));
         }
 
         return total;
