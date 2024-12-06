@@ -9,10 +9,10 @@ public class Helper {
     public static String readToString(String fileName) {
         StringBuilder output = new StringBuilder();
 
-        try(var br = new BufferedReader(new FileReader(fileName))) {
+        try (var br = new BufferedReader(new FileReader(fileName))) {
             String line;
-            while((line = br.readLine()) != null) {
-               output.append(line).append("\n");
+            while ((line = br.readLine()) != null) {
+                output.append(line).append("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -23,9 +23,9 @@ public class Helper {
 
     public static ArrayList<String> readToStringArrayList(String fileName) {
         ArrayList<String> output = new ArrayList<>();
-        try(var br = new BufferedReader(new FileReader(fileName))) {
+        try (var br = new BufferedReader(new FileReader(fileName))) {
             String line;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 output.add(line);
             }
         } catch (IOException e) {
@@ -43,22 +43,43 @@ public class Helper {
             int x = 0;
             for (Character character : line.toCharArray()) {
                 charArray[y][x] = character;
-                x+=1;
+                x += 1;
             }
-            y+=1;
+            y += 1;
         }
         return charArray;
     }
 
-    public static char[][] rotateCW(char[][] mat) {
-        final int M = mat.length;
-        final int N = mat[0].length;
-        char[][] ret = new char[N][M];
-        for (int r = 0; r < M; r++) {
-            for (int c = 0; c < N; c++) {
-                ret[c][M-1-r] = mat[r][c];
+    //    public static char[][] rotateCW(char[][] mat) {
+//        final int M = mat.length;
+//        final int N = mat[0].length;
+//        char[][] ret = new char[N][M];
+//        for (int r = 0; r < M; r++) {
+//            for (int c = 0; c < N; c++) {
+//                ret[c][M-1-r] = mat[r][c];
+//            }
+//        }
+//        return ret;
+//    }
+    public static char[][] rotateCW(char[][] orig) {
+        for (int x = 0; x < 3; x++) {
+            orig = rotateCCW(orig);
+        }
+        return orig;
+    }
+
+    public static char[][] rotateCCW(char[][] orig) {
+        final int rows = orig.length;
+        final int cols = orig[0].length;
+
+        final char[][] neo = new char[cols][rows];
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                neo[c][rows - 1 - r] = orig[r][c];
             }
         }
-        return ret;
+
+        return neo;
     }
 }
