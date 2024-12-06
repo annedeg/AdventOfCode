@@ -34,4 +34,31 @@ public class Helper {
 
         return output;
     }
+
+    public static char[][] toMatrix(String fileName) {
+        ArrayList<String> strings = readToStringArrayList(fileName);
+        char[][] charArray = new char[strings.size()][strings.get(0).length()];
+        int y = 0;
+        for (String line : strings) {
+            int x = 0;
+            for (Character character : line.toCharArray()) {
+                charArray[y][x] = character;
+                x+=1;
+            }
+            y+=1;
+        }
+        return charArray;
+    }
+
+    public static char[][] rotateCW(char[][] mat) {
+        final int M = mat.length;
+        final int N = mat[0].length;
+        char[][] ret = new char[N][M];
+        for (int r = 0; r < M; r++) {
+            for (int c = 0; c < N; c++) {
+                ret[c][M-1-r] = mat[r][c];
+            }
+        }
+        return ret;
+    }
 }
