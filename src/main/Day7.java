@@ -15,7 +15,7 @@ public class Day7 {
             String[] split = string.split(": ");
             long res = Long.parseLong(split[0]);
             Deque<Long> values = Arrays.stream(split[1].split(" ")).map(Long::parseLong).collect(Collectors.toCollection(ArrayDeque::new));
-            char[] operations = new char[]{'+', '*', '|'};
+            char[] operations = new char[]{'+', '*'};
 
             Long startValue = values.pop();
             boolean result = calcWithOp(res, values, startValue, operations, new ArrayList<>());
@@ -64,6 +64,22 @@ public class Day7 {
     }
 
     public void puzzleTwo() {
+        ArrayList<String> strings = Helper.readToStringArrayList("C:\\Users\\adgra\\IdeaProjects\\AdventOfCode2022\\src\\input\\07");
+
+        long total = 0;
+        for (String string : strings) {
+            String[] split = string.split(": ");
+            long res = Long.parseLong(split[0]);
+            Deque<Long> values = Arrays.stream(split[1].split(" ")).map(Long::parseLong).collect(Collectors.toCollection(ArrayDeque::new));
+            char[] operations = new char[]{'+', '*', '|'};
+
+            Long startValue = values.pop();
+            boolean result = calcWithOp(res, values, startValue, operations, new ArrayList<>());
+            if (result) {
+                total+=res;
+            }
+        }
+        System.out.println(total);
     }
 
     public static void main(String[] args) {
