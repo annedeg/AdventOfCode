@@ -3,7 +3,9 @@ package main.helpers;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Helper {
     public static String readToString(String fileName) {
@@ -48,6 +50,70 @@ public class Helper {
             y += 1;
         }
         return charArray;
+    }
+
+    public static ArrayList<MatrixLocation> surroundingTiles(int[][] matrix, MatrixLocation matrixLocation, boolean addDiagonalNeighbour) {
+        int min = 0;
+        int maxY = matrix.length-1;
+        int maxX = matrix[0].length-1;
+
+        int x = matrixLocation.x;
+        int y = matrixLocation.y;
+
+
+        ArrayList<MatrixLocation> locations = new ArrayList<>();
+        locations.add(new MatrixLocation(x-1, y));
+        locations.add(new MatrixLocation(x, y-1));
+        locations.add(new MatrixLocation(x+1, y));
+        locations.add(new MatrixLocation(x, y+1));
+
+        if (addDiagonalNeighbour) {
+            locations.add(new MatrixLocation(x-1, y-1));
+            locations.add(new MatrixLocation(x+1, y-1));
+            locations.add(new MatrixLocation(x+1, y+1));
+            locations.add(new MatrixLocation(x-1, y+1));
+        }
+
+        return locations.stream()
+            .filter(location -> validTile(min, maxY, maxX, location))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private static boolean validTile(int min, int maxY, int maxX, MatrixLocation matrixLocation) {
+        int x = matrixLocation.getX();
+        int y = matrixLocation.getY();
+
+        return x >= min && y >= min && x <= maxX && y <= maxY;
+    }
+
+    public static int[][] toIntMatrix(String fileName) {
+        ArrayList<String> strings = readToStringArrayList(fileName);
+        int[][] charArray = new int[strings.size()][strings.get(0).length()];
+        int y = 0;
+        for (String line : strings) {
+            int x = 0;
+            for (Character character : line.toCharArray()) {
+                if (character ==  '.') {
+                    charArray[y][x] = -1;
+                    x+=1;
+                    continue;
+                }
+                charArray[y][x] = Integer.parseInt(String.valueOf(character));
+                x += 1;
+            }
+            y += 1;
+        }
+        return charArray;
+    }
+
+    public static ArrayList<MatrixLocation> allLocations(int[][] matrix) {
+        ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
+        for (int y = 0; y < matrix.length; y++) {
+            for (int x = 0; x < matrix[y].length; x++) {
+                matrixLocations.add(new MatrixLocation(x,y));
+            }
+        }
+        return matrixLocations;
     }
 
     //    public static char[][] rotateCW(char[][] mat) {

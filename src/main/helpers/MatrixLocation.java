@@ -42,4 +42,8 @@ public class MatrixLocation {
     public int hashCode() {
         return Objects.hash(x, y, direction);
     }
+
+    public int getValue(int[][] matrix) {
+        return matrix[this.getY()][this.getX()];
+    }
 }
