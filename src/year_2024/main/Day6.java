@@ -12,7 +12,7 @@ public class Day6 {
     Direction currDirection = Direction.UP;
 
     {
-        matrix = Helper.toMatrix("C:\\Users\\adgra\\IdeaProjects\\AdventOfCode2022\\src\\resources.year_2024.input\\06");
+        matrix = Helper.toMatrix(2024, 6);
     }
 
     public void puzzleOne() {
