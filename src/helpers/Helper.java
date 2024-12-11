@@ -1,15 +1,67 @@
 package helpers;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.io.*;
+import java.net.*;
 
 public class Helper {
     public static String toFileName(int year, int day) {
-        return "resources/year_" + year + "/" + day;
+        String fileName = "resources/year_" + year + "/" + day;
+        checkOrGet(fileName, year, day);
+        return fileName;
     }
+
+    public static void checkOrGet(String location, int year, int day) {
+        File file = new File(location);
+        if (file.exists() && !file.isDirectory()) {
+            return;
+        }
+
+
+        try {
+            String html = getHTML("https://adventofcode.com/"+ year +"/day/" + day + "/input");
+            try (var fileWriter = new BufferedWriter(new FileWriter(location))) {
+                fileWriter.append(html);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getHTML(String urlToRead) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        try (var conf = new BufferedReader(new FileReader("config/config.conf"))) {
+            String line;
+            while ((line = conf.readLine()) != null) {
+                if (line.startsWith("#")) {
+                    continue;
+                }
+                stringBuilder.append(line);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        conn.setRequestProperty("Cookie", stringBuilder.toString());
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()))) {
+            for (String line; (line = reader.readLine()) != null; ) {
+                result.append(line).append("\n");
+            }
+        }
+        return result.toString();
+    }
+
     public static String readToString(int year, int day) {
         StringBuilder output = new StringBuilder();
 
@@ -95,6 +147,9 @@ public class Helper {
         for (String line : strings) {
             int x = 0;
             for (Character character : line.toCharArray()) {
+                if (character.toString().equals(" ")) {
+                    continue;
+                }
                 if (character ==  '.') {
                     charArray[y][x] = -1;
                     x+=1;
