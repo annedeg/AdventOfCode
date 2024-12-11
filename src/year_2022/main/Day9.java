@@ -4,7 +4,9 @@ import helpers.CodeDay;
 import helpers.*;
 import helpers.Position;
 
+import helpers.Position;
 import java.util.ArrayList;
+
 
 
 public class Day9 extends CodeDay {
