@@ -1,6 +1,6 @@
 package year_2024.main;
 
-import year_2024.main.helpers.Helper;
+import helpers.*;
 
 import java.util.ArrayList;
 import java.util.List;

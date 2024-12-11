@@ -1,8 +1,8 @@
 package year_2024.main;
 
-import year_2024.main.helpers.Direction;
-import year_2024.main.helpers.Helper;
-import year_2024.main.helpers.MatrixLocation;
+import helpers.Direction;
+import helpers.*;
+import helpers.MatrixLocation;
 
 import java.util.ArrayList;
 
