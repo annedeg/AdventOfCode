@@ -8,7 +8,7 @@ import java.util.*;
 public class Day6 extends CodeDay {
     @Override
     public void puzzleOne() {
-        var input = Helper.readToString("src/input/daysix.txt");
+        var input = Helper.readToString(2022, 6);
 
         LinkedList<Character> list = new LinkedList<>();
         int counter = 0;
@@ -31,7 +31,7 @@ public class Day6 extends CodeDay {
 
     @Override
     public void puzzleTwo() {
-        var input = Helper.readToString("src/input/daysix.txt");
+        var input = Helper.readToString(2022, 6);
 
         LinkedList<Character> list = new LinkedList<>();
         int counter = 0;

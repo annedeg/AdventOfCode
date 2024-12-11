@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Day11 extends CodeDay {
     @Override
     public void puzzleOne() {
-        var input = Helper.readToString("src/input/day11");
+        var input = Helper.readToString(2022, 11);
         var monkeys = new ArrayList<Monkey>();
         for (var monkey : input.split("\n\n")) {
             monkeys.add(new Monkey(monkey));
@@ -33,7 +33,7 @@ public class Day11 extends CodeDay {
 
     @Override
     public void puzzleTwo() {
-        var input = Helper.readToString("src/input/day11");
+        var input = Helper.readToString(2022, 11);
         var monkeys = new ArrayList<Monkey>();
         var superModule = 1;
         for (var monkey : input.split("\n\n")) {

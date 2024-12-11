@@ -288,7 +288,7 @@ public class Day23 extends CodeDay {
 
     @Override
     public void puzzleTwo() {
-        ArrayList<String> values = Helper.readToStringArrayList("C:\\Users\\adgra\\IdeaProjects\\AdventOfCode2022\\src\\input\\day23");
+        ArrayList<String> values = Helper.readToStringArrayList(2023,23);
         char[][] map = new char[values.size()][values.get(0).length()];
 
         int x = 0;

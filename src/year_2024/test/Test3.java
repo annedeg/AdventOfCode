@@ -1,9 +1,9 @@
 package year_2024.test;
 
-import year_2024.main.Day3;
 import org.junit.jupiter.api.Test;
+import year_2024.main.Day3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Test3 {
     Day3 day = new Day3();

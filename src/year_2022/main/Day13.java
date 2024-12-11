@@ -1,14 +1,13 @@
 package year_2022.main;
 
 import helpers.CodeDay;
-import helpers.*;
+import helpers.Helper;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Arrays.compare;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.IntStream.range;
@@ -140,7 +139,7 @@ public class Day13 extends CodeDay {
 
     @Override
     public void puzzleTwo() {
-        var input = Helper.readToString("src/input/day13");
+        var input = Helper.readToString(2022, 13);
         var in = streamLines(input+"\n[[2]]\n[[6]]")
                 .filter(s -> !s.isEmpty())
                 .map(this::node)
