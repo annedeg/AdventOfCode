@@ -3,53 +3,29 @@ package year_2024.main;
 import helpers.Helper;
 import helpers.MatrixLocation;
 
-import javax.management.MBeanAttributeInfo;
-import java.lang.reflect.Array;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Day12 {
 
     public void puzzleOne() {
         char[][] input = Helper.toMatrix(2024, 12);
-        ArrayList<MatrixLocation> visitedOrIncluded = new ArrayList<>();
-        ArrayList<ArrayList<MatrixLocation>> chunks = new ArrayList<>();
-        ArrayList<MatrixLocation> allLocations = Helper.allLocations(input);
-        for (MatrixLocation currentLocation : allLocations) {
-            if (visitedOrIncluded.contains(currentLocation)) {
-                continue;
-            }
 
-            char currChar = input[currentLocation.getY()][currentLocation.getX()];
-            ArrayList<MatrixLocation> matrixLocations = findAllChunkz(input, currChar, currentLocation, new ArrayList<>(), new ArrayList<>());
-            chunks.add(matrixLocations);
-            visitedOrIncluded.addAll(matrixLocations);
-        }
-
-        int total = chunks.stream()
-            .mapToInt(list -> area(list) * perimeter(input, list))
-            .sum();
+        int total = calculateChunkz(input).stream()
+                .mapToInt(list -> area(list) * perimeter(input, list))
+                .sum();
 
         System.out.println(total);
     }
 
-    private int area(ArrayList<MatrixLocation> list) {
-        return list.size();
-    }
+    public void puzzleTwo() {
+        char[][] input = Helper.toMatrix(2024, 12);
 
-    private int perimeter(char[][] matrix, ArrayList<MatrixLocation> list) {
-        int total = 0;
-        for (MatrixLocation matrixLocation : list) {
-            ArrayList<MatrixLocation> surroundingTiles = Helper.surroundingTiles(matrix, matrixLocation, false);
-            int amountOfNeigbours = surroundingTiles.stream().mapToInt(loc -> list.contains(loc) ? 1 : 0).sum();
-            total += 4 - amountOfNeigbours;
-        }
-        return total;
+
+        int total = calculateChunkz(input).stream()
+                .mapToInt(list -> area(list) * numberOfSides(input, list))
+                .sum();
+
+        System.out.println(total);
     }
 
     private ArrayList<MatrixLocation> findAllChunkz(char[][] matrix, char toFind, MatrixLocation location, ArrayList<MatrixLocation> history, ArrayList<MatrixLocation> values) {
@@ -65,15 +41,27 @@ public class Day12 {
 
         values.add(location);
 
-        for (MatrixLocation loc : Helper.surroundingTiles(matrix, location, false)) {
-            findAllChunkz(matrix, toFind, loc, history, values);
-        }
+        Helper.surroundingTiles(matrix, location, false)
+                .forEach(loc -> findAllChunkz(matrix, toFind, loc, history, values));
 
         return values;
     }
 
-    public void puzzleTwo() {
-        char[][] input = Helper.toMatrix(2024, 12);
+
+    private int area(ArrayList<MatrixLocation> list) {
+        return list.size();
+    }
+
+    private int perimeter(char[][] matrix, ArrayList<MatrixLocation> list) {
+        int total = 0;
+        for (MatrixLocation matrixLocation : list) {
+            ArrayList<MatrixLocation> surroundingTiles = Helper.surroundingTiles(matrix, matrixLocation, false);
+            int amountOfNeigbours = surroundingTiles.stream().mapToInt(loc -> list.contains(loc) ? 1 : 0).sum();
+            total += 4 - amountOfNeigbours;
+        }
+        return total;
+    }
+    private ArrayList<ArrayList<MatrixLocation>> calculateChunkz(char[][] input) {
         ArrayList<MatrixLocation> visitedOrIncluded = new ArrayList<>();
         ArrayList<ArrayList<MatrixLocation>> chunks = new ArrayList<>();
         ArrayList<MatrixLocation> allLocations = Helper.allLocations(input);
@@ -87,57 +75,52 @@ public class Day12 {
             chunks.add(matrixLocations);
             visitedOrIncluded.addAll(matrixLocations);
         }
-
-        int total = chunks.stream()
-            .mapToInt(list -> area(list) * numberOfSides(input, list))
-            .sum();
-
-        System.out.println(total);
+        return chunks;
     }
 
     private int numberOfSides(char[][] input, ArrayList<MatrixLocation> list) {
-        int total = 0;
-        for (MatrixLocation matrixLocation : list) {
-            total += sides(input, matrixLocation, list);
-        }
-
-        System.out.println(list);
-        System.out.println(total);
-        System.out.println();
-        return total;
+        return list.stream().mapToInt(loc -> sides(input, loc)).sum();
     }
 
-    private int sides(char[][] input, MatrixLocation location, ArrayList<MatrixLocation> valid) {
+    private int sides(char[][] input, MatrixLocation location) {
+        int sides = 0;
+
         int y = location.getY();
         int x = location.getX();
 
-        char[][] clone = input.clone();
-        int sides = 0;
+        char toFind = input[y][x];
 
+        char u = exToChar(input, y - 1, x);
+        char l = exToChar(input, y, x - 1);
+        char d = exToChar(input, y + 1, x);
+        char r = exToChar(input, y, x + 1);
 
-        StringBuilder b = new StringBuilder();
-        for (int s = 0; s < 4; s++) {
-            for (int yi = y; yi < y + 1; yi++) {
-                for (int xi = x; xi < x + 1; xi++) {
-                    if (valid.contains(new MatrixLocation(yi, xi))) {
-                        b.append("1");
-                    } else {
-                        b.append("0");
-                    }
-                }
-            }
+        char ul = exToChar(input, y-1, x-1);
+        char ur = exToChar(input, y-1, x+1);
+        char dl = exToChar(input, y+1, x-1);
+        char dr = exToChar(input, y+1, x+1);
 
-            int index = Integer.parseInt(b.toString(), 2);
-
-            if (!Stream.of(0, 3, 5, 10, 12, 15).toList().contains(index)) {
-                if (index == 6 || index == 9) {
-                    sides += 1;
-                }
-                sides += 1;
-            }
+        if ((u != toFind && l != toFind) || (u == toFind && l == toFind && ul != toFind)) {
+            sides+=1;
         }
-
+        if ((u != toFind && r != toFind) || (u == toFind && r == toFind && ur != toFind)) {
+            sides+=1;
+        }
+        if ((d != toFind && l != toFind) || (d == toFind && l == toFind && dl != toFind)) {
+            sides+=1;
+        }
+        if ((d != toFind && r != toFind) || (d == toFind && r == toFind && dr != toFind)) {
+            sides+=1;
+        }
         return sides;
+    }
+
+    private char exToChar(char[][] input, int i, int i1) {
+        try {
+            return input[i][i1];
+        } catch (IndexOutOfBoundsException e) {
+            return '.';
+        }
     }
 
     public static void main(String[] args) {
