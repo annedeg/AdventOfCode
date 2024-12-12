@@ -133,6 +133,33 @@ public class Helper {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public static ArrayList<MatrixLocation> surroundingTiles(char[][] matrix, MatrixLocation matrixLocation, boolean addDiagonalNeighbour) {
+        int min = 0;
+        int maxY = matrix.length-1;
+        int maxX = matrix[0].length-1;
+
+        int x = matrixLocation.x;
+        int y = matrixLocation.y;
+
+
+        ArrayList<MatrixLocation> locations = new ArrayList<>();
+        locations.add(new MatrixLocation(x-1, y));
+        locations.add(new MatrixLocation(x, y-1));
+        locations.add(new MatrixLocation(x+1, y));
+        locations.add(new MatrixLocation(x, y+1));
+
+        if (addDiagonalNeighbour) {
+            locations.add(new MatrixLocation(x-1, y-1));
+            locations.add(new MatrixLocation(x+1, y-1));
+            locations.add(new MatrixLocation(x+1, y+1));
+            locations.add(new MatrixLocation(x-1, y+1));
+        }
+
+        return locations.stream()
+            .filter(location -> validTile(min, maxY, maxX, location))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private static boolean validTile(int min, int maxY, int maxX, MatrixLocation matrixLocation) {
         int x = matrixLocation.getX();
         int y = matrixLocation.getY();
@@ -164,6 +191,16 @@ public class Helper {
     }
 
     public static ArrayList<MatrixLocation> allLocations(int[][] matrix) {
+        ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
+        for (int y = 0; y < matrix.length; y++) {
+            for (int x = 0; x < matrix[y].length; x++) {
+                matrixLocations.add(new MatrixLocation(x,y));
+            }
+        }
+        return matrixLocations;
+    }
+
+    public static ArrayList<MatrixLocation> allLocations(char[][] matrix) {
         ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[y].length; x++) {

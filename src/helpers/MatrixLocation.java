@@ -46,4 +46,8 @@ public class MatrixLocation {
     public int getValue(int[][] matrix) {
         return matrix[this.getY()][this.getX()];
     }
+
+    public int getValue(char[][] matrix) {
+        return matrix[this.getY()][this.getX()];
+    }
 }
