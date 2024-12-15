@@ -3,6 +3,7 @@ package helpers;
 import java.util.Objects;
 
 public class MatrixLocation {
+    private char val;
     public int x;
     public int y;
     public Direction direction;
@@ -16,6 +17,17 @@ public class MatrixLocation {
         this.x = x;
         this.y = y;
         this.direction = direction;
+    }
+
+    public MatrixLocation(int x, int y, char val) {
+        this.x = x;
+        this.y = y;
+        this.val = val;
+        this.direction = Direction.UP;
+    }
+
+    public char getVal() {
+        return val;
     }
 
     public int getY() {

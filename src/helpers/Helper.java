@@ -93,6 +93,10 @@ public class Helper {
 
     public static char[][] toMatrix(int year, int day) {
         ArrayList<String> strings = readToStringArrayList(year, day);
+        return toMatrix(strings);
+    }
+
+    public static char[][] toMatrix(ArrayList<String> strings) {
         char[][] charArray = new char[strings.size()][strings.get(0).length()];
         int y = 0;
         for (String line : strings) {
