@@ -39,12 +39,12 @@ public class Day6 {
         while (!finished()) {
             movePlayer();
             matrix = Helper.rotateCW(matrix);
-            currDirection = currDirection.getNext(currDirection);
+            currDirection = currDirection.rotateRight();
         }
 
         while (currDirection != Direction.RIGHT) {
             matrix = Helper.rotateCW(matrix);
-            currDirection = currDirection.getNext(currDirection);
+            currDirection = currDirection.rotateRight();
         }
 
         ArrayList<MatrixLocation> todo = new ArrayList<>();
@@ -78,7 +78,7 @@ public class Day6 {
                 movePlayer();
                 historyBeforeRotate.add(findPlayer());
                 matrix = Helper.rotateCW(matrix);
-                currDirection = currDirection.getNext(currDirection);
+                currDirection = currDirection.rotateRight();
 
                 if (loopFound(historyBeforeRotate)) {
                     System.out.println("y:" + y + " x:" + x);
