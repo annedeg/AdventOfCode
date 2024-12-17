@@ -49,7 +49,23 @@ public class DirectionalNode extends Node {
                 '}';
     }
 
+    public boolean anyParentHasLocation(DirectionalNode directionalNode) {
+        DirectionalNode currentNode = this;
+        while (directionalNode.getParent() != null) {
+            if (directionalNode.getX() == currentNode.getX() && directionalNode.getY() == currentNode.getY()) {
+                return true;
+            }
+
+            directionalNode = directionalNode.getParent();
+        }
+        return false;
+    }
+
     public MatrixLocation toMatrixLocation() {
         return new MatrixLocation(this.getX(), this.getY());
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 }

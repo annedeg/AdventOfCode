@@ -3,12 +3,15 @@ package year_2024.main;
 import helpers.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Day16 {
     DirectionalNode startNode;
-    Node endNode ;
+    Node endNode;
+
     public void puzzleOne() {
         char[][] map = Helper.toMatrix(2024, 16);
         MatrixLocation start = new MatrixLocation(1, map.length - 2, Direction.RIGHT);
@@ -16,8 +19,8 @@ public class Day16 {
 
         ArrayList<MatrixLocation> history = new ArrayList<>();
 //        int shortestPath = getShortestPath(start, end, map, 0, history, false);
-        startNode = new DirectionalNode(1, map.length-1, 0 , 0, Direction.RIGHT);
-        endNode = new Node(end.getX(), end.getY(), 0 , 0);
+        startNode = new DirectionalNode(1, map.length - 1, 0, 0, Direction.RIGHT);
+        endNode = new Node(end.getX(), end.getY(), 0, 0);
         DirectionalNode shortestPath = getShortestPath(map, startNode);
         System.out.println(shortestPath.getG());
     }
@@ -63,19 +66,19 @@ public class Day16 {
         while (!openList.isEmpty()) {
             DirectionalNode q = openList.remove(getLowestNodeInList(openList));
             ArrayList<DirectionalNode> successors = generateSuccessors(q, map);
-            for (DirectionalNode successor:successors) {
-                if(successor.getX() == endNode.getX() && successor.getY() == endNode.getY()) {
+            for (DirectionalNode successor : successors) {
+                if (successor.getX() == endNode.getX() && successor.getY() == endNode.getY()) {
                     return successor;
                 }
 
                 int index = inListIndex(openList, successor);
-                if(index != -1) {
-                    if(openList.get(index).getF() <= successor.getF())
+                if (index != -1) {
+                    if (openList.get(index).getF() <= successor.getF())
                         continue;
                 }
 
                 index = inListIndex(closedList, successor);
-                if(index == -1) {
+                if (index == -1) {
                     openList.add(successor);
                 }
             }
@@ -92,13 +95,13 @@ public class Day16 {
             q = q.getParent();
         }
 
-        printMap(map,matrixLocations);
+        printMap(map, matrixLocations);
     }
 
     private int inListIndex(ArrayList<DirectionalNode> listItems, DirectionalNode node) {
         int counter = 0;
-        for(DirectionalNode item:listItems) {
-            if(item.getX() == node.getX() && item.getY() == node.getY() && item.getDirection() == node.getDirection()) {
+        for (DirectionalNode item : listItems) {
+            if (item.getX() == node.getX() && item.getY() == node.getY() && item.getDirection() == node.getDirection()) {
                 return counter;
             }
             counter++;
@@ -128,7 +131,10 @@ public class Day16 {
         MatrixLocation ahead = da.stepForward(curLoc);
         DirectionalNode a = new DirectionalNode(ahead.getX(), ahead.getY(), currG + 1, 0, da);
 
-        ArrayList<DirectionalNode> collect = Stream.of(l, r, a).filter(directionalNode -> map[directionalNode.getY()][directionalNode.getX()] != '#').collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<DirectionalNode> collect = Stream.of(l, r, a)
+                .filter(directionalNode -> map[directionalNode.getY()][directionalNode.getX()] != '#')
+                .filter(directionalNode -> !q.anyParentHasLocation(directionalNode))
+                .collect(Collectors.toCollection(ArrayList::new));
         collect.forEach(directionalNode -> directionalNode.setParent(q));
         return collect;
     }
@@ -138,15 +144,15 @@ public class Day16 {
     }
 
     private double generateH(MatrixLocation matrixLocation) {
-        return Math.abs(matrixLocation.getX()-endNode.getX()) + Math.abs(matrixLocation.getY()-endNode.getY());
+        return Math.abs(matrixLocation.getX() - endNode.getX()) + Math.abs(matrixLocation.getY() - endNode.getY());
     }
 
     private int getLowestNodeInList(ArrayList<DirectionalNode> list) {
         int counter = 0;
         int index = -1;
         double lowestF = Double.MAX_VALUE;
-        for(Node listItem : list) {
-            if(listItem.getF() < lowestF) {
+        for (Node listItem : list) {
+            if (listItem.getF() < lowestF) {
                 lowestF = listItem.getF();
                 index = counter;
             }
@@ -159,8 +165,8 @@ public class Day16 {
         int counter = 0;
         int index = -1;
         double lowestF = Double.MAX_VALUE;
-        for(Node listItem : list) {
-            if(listItem.getG() < lowestF) {
+        for (Node listItem : list) {
+            if (listItem.getG() < lowestF) {
                 lowestF = listItem.getG();
                 index = counter;
             }
@@ -168,7 +174,6 @@ public class Day16 {
         }
         return index;
     }
-
 
 
     private static void printMap(char[][] map, ArrayList<MatrixLocation> matrixLocations) {
@@ -193,9 +198,9 @@ public class Day16 {
 
         ArrayList<MatrixLocation> history = new ArrayList<>();
 //        int shortestPath = getShortestPath(start, end, map, 0, history, false);
-        startNode = new DirectionalNode(1, map.length-2, 0 , 0, Direction.RIGHT);
-        endNode = new Node(end.getX(), end.getY(), 0 , 0);
-        ArrayList<DirectionalNode> shortestPaths = getShortestPathP2(map, startNode);
+        startNode = new DirectionalNode(1, map.length - 2, 0, 0, Direction.RIGHT);
+        endNode = new Node(end.getX(), end.getY(), 0, 0);
+        ArrayList<DirectionalNode> shortestPaths = getShortestPathP3(map, startNode);
 
         char[][] mapClone = map.clone();
         for (DirectionalNode directionalNode : shortestPaths) {
@@ -209,7 +214,7 @@ public class Day16 {
         for (char[] chars : mapClone) {
             for (char ch : chars) {
                 if (ch == 'O' || ch == 'S' || ch == 'E') {
-                    total+=1;
+                    total += 1;
                 }
             }
         }
@@ -228,8 +233,9 @@ public class Day16 {
         while (!openList.isEmpty()) {
             DirectionalNode q = openList.remove(getLowestGNodeInList(openList));
             ArrayList<DirectionalNode> successors = generateSuccessors(q, map);
+            printMap(map, q);
             for (DirectionalNode successor : successors) {
-                if(successor.getX() == endNode.getX() && successor.getY() == endNode.getY() && shorte == -1) {
+                if (successor.getX() == endNode.getX() && successor.getY() == endNode.getY() && shorte == -1) {
                     shorte = successor.getG();
                     shortest.add(successor);
                 }
@@ -243,13 +249,15 @@ public class Day16 {
                 }
 
                 int index = inListIndex(openList, successor);
-                if(index != -1) {
-                    if(openList.get(index).getG() < successor.getG())
+                if (index != -1) {
+                    if (openList.get(index).getG() < successor.getG()) {
+                        System.out.println("skipped");
                         continue;
+                    }
                 }
 
                 index = inListIndex(closedList, successor);
-                if(index == -1) {
+                if (index == -1) {
                     openList.add(successor);
                 }
 
@@ -259,6 +267,57 @@ public class Day16 {
         }
 
         return shortest;
+    }
+
+    private ArrayList<DirectionalNode> getShortestPathP3(char[][] map, DirectionalNode startNode) {
+        ArrayList<DirectionalNode> unvisited = Helper.allLocations(map).stream()
+                .map(location -> new DirectionalNode(location.getX(), location.getY(), Integer.MAX_VALUE, 0, null))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        HashMap<DirectionalNode, Double> costOfNodes = new HashMap<>();
+
+        unvisited.stream()
+                .filter(unvisitedNode -> unvisitedNode.getX() == startNode.getX() || unvisitedNode.getY() == startNode.getY())
+                .findFirst()
+                .ifPresent(node -> {
+                    node.setG(0);
+                    node.setDirection(Direction.RIGHT);
+                });
+
+        Optional<DirectionalNode> lowestGNodeInList = getLowestNodeByGInList(unvisited);
+        if (lowestGNodeInList.isEmpty()) {
+            //skip to 6
+            return null;
+        }
+
+        DirectionalNode node = lowestGNodeInList.get();
+        ArrayList<DirectionalNode> directionalNodes = generateSuccessors(node, map);
+        for (DirectionalNode directionalNode : directionalNodes) {
+            if (costOfNodes.containsKey(directionalNode)) {
+                if (costOfNodes.get(directionalNode) > directionalNode.getG())
+            }
+            costOfNodes.put(directionalNode, directionalNode.getG());
+        }
+
+    }
+
+    private Optional<DirectionalNode> getLowestNodeByGInList(ArrayList<DirectionalNode> list) {
+        int counter = 0;
+        int index = -1;
+        double lowestF = Double.MAX_VALUE;
+        for (Node listItem : list) {
+            if (listItem.getG() < lowestF) {
+                lowestF = listItem.getG();
+                index = counter;
+            }
+            counter++;
+        }
+
+        if (index == -1) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(list.get(index));
     }
 
     public static void main(String[] args) {
