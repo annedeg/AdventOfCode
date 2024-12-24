@@ -50,6 +50,10 @@ public class MatrixLocation {
         return x == that.x && y == that.y && direction == that.direction;
     }
 
+    public boolean locationEquals(MatrixLocation ml) {
+        return x == ml.x && y == ml.y;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(x, y, direction);
@@ -61,5 +65,17 @@ public class MatrixLocation {
 
     public char getValue(char[][] matrix) {
         return matrix[this.getY()][this.getX()];
+    }
+
+    public Node toNode(int h, int g) {
+        return new Node(this.getX(), this.getY(), g, h);
+    }
+
+    @Override
+    public String toString() {
+        return "MatrixLocation{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 }

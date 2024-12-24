@@ -1,13 +1,12 @@
 package helpers;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Helper {
     public static String toFileName(int year, int day) {
@@ -24,7 +23,7 @@ public class Helper {
 
 
         try {
-            String html = getHTML("https://adventofcode.com/"+ year +"/day/" + day + "/input");
+            String html = getHTML("https://adventofcode.com/" + year + "/day/" + day + "/input");
             try (var fileWriter = new BufferedWriter(new FileWriter(location))) {
                 fileWriter.append(html);
             }
@@ -112,56 +111,56 @@ public class Helper {
 
     public static ArrayList<MatrixLocation> surroundingTiles(int[][] matrix, MatrixLocation matrixLocation, boolean addDiagonalNeighbour) {
         int min = 0;
-        int maxY = matrix.length-1;
-        int maxX = matrix[0].length-1;
+        int maxY = matrix.length - 1;
+        int maxX = matrix[0].length - 1;
 
         int x = matrixLocation.x;
         int y = matrixLocation.y;
 
 
         ArrayList<MatrixLocation> locations = new ArrayList<>();
-        locations.add(new MatrixLocation(x-1, y));
-        locations.add(new MatrixLocation(x, y-1));
-        locations.add(new MatrixLocation(x+1, y));
-        locations.add(new MatrixLocation(x, y+1));
+        locations.add(new MatrixLocation(x - 1, y));
+        locations.add(new MatrixLocation(x, y - 1));
+        locations.add(new MatrixLocation(x + 1, y));
+        locations.add(new MatrixLocation(x, y + 1));
 
         if (addDiagonalNeighbour) {
-            locations.add(new MatrixLocation(x-1, y-1));
-            locations.add(new MatrixLocation(x+1, y-1));
-            locations.add(new MatrixLocation(x+1, y+1));
-            locations.add(new MatrixLocation(x-1, y+1));
+            locations.add(new MatrixLocation(x - 1, y - 1));
+            locations.add(new MatrixLocation(x + 1, y - 1));
+            locations.add(new MatrixLocation(x + 1, y + 1));
+            locations.add(new MatrixLocation(x - 1, y + 1));
         }
 
         return locations.stream()
-            .filter(location -> validTile(min, maxY, maxX, location))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .filter(location -> validTile(min, maxY, maxX, location))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static ArrayList<MatrixLocation> surroundingTiles(char[][] matrix, MatrixLocation matrixLocation, boolean addDiagonalNeighbour) {
         int min = 0;
-        int maxY = matrix.length-1;
-        int maxX = matrix[0].length-1;
+        int maxY = matrix.length - 1;
+        int maxX = matrix[0].length - 1;
 
         int x = matrixLocation.x;
         int y = matrixLocation.y;
 
 
         ArrayList<MatrixLocation> locations = new ArrayList<>();
-        locations.add(new MatrixLocation(x-1, y));
-        locations.add(new MatrixLocation(x, y-1));
-        locations.add(new MatrixLocation(x+1, y));
-        locations.add(new MatrixLocation(x, y+1));
+        locations.add(new MatrixLocation(x - 1, y));
+        locations.add(new MatrixLocation(x, y - 1));
+        locations.add(new MatrixLocation(x + 1, y));
+        locations.add(new MatrixLocation(x, y + 1));
 
         if (addDiagonalNeighbour) {
-            locations.add(new MatrixLocation(x-1, y-1));
-            locations.add(new MatrixLocation(x+1, y-1));
-            locations.add(new MatrixLocation(x+1, y+1));
-            locations.add(new MatrixLocation(x-1, y+1));
+            locations.add(new MatrixLocation(x - 1, y - 1));
+            locations.add(new MatrixLocation(x + 1, y - 1));
+            locations.add(new MatrixLocation(x + 1, y + 1));
+            locations.add(new MatrixLocation(x - 1, y + 1));
         }
 
         return locations.stream()
-            .filter(location -> validTile(min, maxY, maxX, location))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .filter(location -> validTile(min, maxY, maxX, location))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private static boolean validTile(int min, int maxY, int maxX, MatrixLocation matrixLocation) {
@@ -169,6 +168,27 @@ public class Helper {
         int y = matrixLocation.getY();
 
         return x >= min && y >= min && x <= maxX && y <= maxY;
+    }
+
+    public static void printMap(char[][] map) {
+        int x = 0;
+        System.out.print("yx");
+        for (char[] chars : map) {
+            System.out.printf("%02d ", x);
+            x++;
+        }
+        System.out.println();
+
+        int y = 0;
+        for (char[] chars : map) {
+            System.out.printf("%02d", y);
+            for (char aChar : chars) {
+                System.out.print(" " + aChar + " ");
+            }
+            System.out.println();
+            y++;
+        }
+        System.out.println();
     }
 
     public static int[][] toIntMatrix(int year, int day) {
@@ -181,9 +201,9 @@ public class Helper {
                 if (character.toString().equals(" ")) {
                     continue;
                 }
-                if (character ==  '.') {
+                if (character == '.') {
                     charArray[y][x] = -1;
-                    x+=1;
+                    x += 1;
                     continue;
                 }
                 charArray[y][x] = Integer.parseInt(String.valueOf(character));
@@ -198,7 +218,7 @@ public class Helper {
         ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[y].length; x++) {
-                matrixLocations.add(new MatrixLocation(x,y));
+                matrixLocations.add(new MatrixLocation(x, y));
             }
         }
         return matrixLocations;
@@ -208,7 +228,7 @@ public class Helper {
         ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[y].length; x++) {
-                matrixLocations.add(new MatrixLocation(x,y));
+                matrixLocations.add(new MatrixLocation(x, y));
             }
         }
         return matrixLocations;
@@ -245,5 +265,24 @@ public class Helper {
         }
 
         return neo;
+    }
+
+    public static MatrixLocation findFirstCharInMap(char[][] map, char c) {
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                if (map[y][x] == c) {
+                    return new MatrixLocation(x,y);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static char[][] deepCopy(char[][] original) {
+        if (original == null) {
+            return null;
+        }
+
+        return Arrays.stream(original).map(chars -> Arrays.copyOf(chars, chars.length)).toArray(char[][]::new);
     }
 }

@@ -294,11 +294,12 @@ public class Day16 {
         ArrayList<DirectionalNode> directionalNodes = generateSuccessors(node, map);
         for (DirectionalNode directionalNode : directionalNodes) {
             if (costOfNodes.containsKey(directionalNode)) {
-                if (costOfNodes.get(directionalNode) > directionalNode.getG())
+//                if (costOfNodes.get(directionalNode) > directionalNode.getG())
             }
             costOfNodes.put(directionalNode, directionalNode.getG());
         }
 
+        return null;
     }
 
     private Optional<DirectionalNode> getLowestNodeByGInList(ArrayList<DirectionalNode> list) {

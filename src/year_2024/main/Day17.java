@@ -3,12 +3,8 @@ package year_2024.main;
 import helpers.Helper;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.StringJoiner;
-import java.util.regex.Pattern;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Day17 {
     public void puzzleOne() {
@@ -22,9 +18,6 @@ public class Day17 {
         ThreeBitComputer threeBitComputer = new ThreeBitComputer(instruction, bigIntegers.get(0), bigIntegers.get(1), bigIntegers.get(2));
         String output = threeBitComputer.calculateAll();
         System.out.println(output);
-        threeBitComputer.printRegisters();
-        BigInteger bigInteger = new BigInteger(output.replaceAll(",", ""));
-        System.out.println(bigInteger);
     }
 
     class ThreeBitComputer {
@@ -75,7 +68,9 @@ public class Day17 {
                     pointer = operand;
                 }
                 case 4 -> b = c.xor(b);
-                case 5 -> output.add(String.valueOf((getCombo(operand).mod(BigInteger.valueOf(8)))));
+                case 5 -> {
+                    output.add(String.valueOf((getCombo(operand).mod(BigInteger.valueOf(8)))));
+                }
                 case 6 -> b = dv(operand);
                 case 7 -> c = dv(operand);
                 default -> throw new IllegalStateException("Unexpected value: " + opcode);
@@ -132,17 +127,48 @@ public class Day17 {
 
         String instruction = input[1].split(": ")[1].replaceAll("\n", "");
 
-        BigInteger bigInteger = new BigInteger("0");
-        while (true) {
-            bigInteger = bigInteger.add(BigInteger.valueOf(2097152));
-            ThreeBitComputer threeBitComputer = new ThreeBitComputer(instruction, bigInteger, bigIntegers.get(1), bigIntegers.get(2));
-            String output = threeBitComputer.calculateAll();
-            if (output.equals(instruction)) {
-                System.out.println(bigInteger);
-                break;
+        String s1 = instruction.replaceAll(",", "");
+
+        Optional<BigInteger> search = search(BigInteger.ZERO, instruction.split(",").length-1, instruction);
+
+        System.out.println(search.get());
+
+    }
+
+    public Optional<BigInteger> search(BigInteger a, int depth, String instruction) {
+        if (depth < 0) {
+            return Optional.empty();
+        }
+
+        for (int i = 0; i < 8; i++) {
+            BigInteger bigInteger = BigInteger.valueOf(i).shiftLeft((3 * depth));
+            BigInteger newA = a.or(bigInteger);
+            ThreeBitComputer threeBitComputer = new ThreeBitComputer(instruction, newA, BigInteger.ZERO, BigInteger.ZERO);
+            String result = threeBitComputer.calculateAll();
+
+            String[] replacedResult = result.split(",");
+            String[] replacedInstruction = instruction.split(",");
+            if (replacedResult.length == replacedInstruction.length) {
+                if (result.equals(instruction)) {
+                    return Optional.of(newA);
+                }
+
+
+                if (Objects.equals(replacedResult[depth], replacedInstruction[depth])) {
+                    Optional<BigInteger> search = search(newA, depth - 1, instruction);
+                    if (search.isPresent()) {
+                        return search;
+                    }
+                }
             }
         }
+
+        return Optional.empty();
     }
+
+//    public String toBin(int val) {
+//
+//    }
 
     public static void main(String[] args) {
         Day17 day = new Day17();
