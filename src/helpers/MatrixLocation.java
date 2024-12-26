@@ -6,6 +6,7 @@ public class MatrixLocation {
     private char val;
     public int x;
     public int y;
+    public int dist;
     public Direction direction;
     public MatrixLocation(int x, int y) {
         this.x = x;
@@ -24,6 +25,14 @@ public class MatrixLocation {
         this.y = y;
         this.val = val;
         this.direction = Direction.UP;
+    }
+
+    public void setDist(int dist) {
+        this.dist = dist;
+    }
+
+    public int getDist() {
+        return dist;
     }
 
     public char getVal() {

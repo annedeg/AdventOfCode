@@ -172,18 +172,39 @@ public class Helper {
 
     public static void printMap(char[][] map) {
         int x = 0;
-        System.out.print("yx");
+        System.out.print(" yx ");
         for (char[] chars : map) {
-            System.out.printf("%02d ", x);
+            System.out.printf(" %02d ", x);
             x++;
         }
         System.out.println();
 
         int y = 0;
         for (char[] chars : map) {
-            System.out.printf("%02d", y);
+            System.out.printf(" %02d ", y);
             for (char aChar : chars) {
-                System.out.print(" " + aChar + " ");
+                System.out.printf(" %c  ", aChar);
+            }
+            System.out.println();
+            y++;
+        }
+        System.out.println();
+    }
+
+    public static void printMap(int[][] map) {
+        int x = 0;
+        System.out.print(" yx ");
+        for (int[] chars : map) {
+            System.out.printf(" %02d ", x);
+            x++;
+        }
+        System.out.println();
+
+        int y = 0;
+        for (int[] chars : map) {
+            System.out.printf(" %02d ", y);
+            for (int aChar : chars) {
+                System.out.printf(" %02d ", aChar);
             }
             System.out.println();
             y++;

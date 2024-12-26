@@ -1,8 +1,15 @@
 package year_2024.main;
 
 import helpers.Helper;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class Day24 {
     class Operation {
@@ -86,10 +93,125 @@ public class Day24 {
     }
 
     public void puzzleOne() {
+        HashMap<String, Integer> variables = createVariables();
+        ArrayList<Operation> operations = createOperations(variables);
+        System.out.println(getZOutput(operations, variables));
+    }
+
+    public void puzzleTwo() {
+        System.setProperty("org.graphstream.ui", "swing");
+        ArrayList<Operation> operations = createOperations(createVariables());
+
+        Graph graph = new SingleGraph("todo");
+        for (Operation operation : operations) {
+            addToGraph(graph, operation.v1Name, operation);
+            addToGraph(graph, operation.v2Name, operation);
+            addToGraph(graph, operation.resultName, operation);
+            graph.addEdge(operation.v1Name + operation.resultName, operation.v1Name, operation.resultName);
+            graph.addEdge(operation.v2Name + operation.resultName,operation.v2Name, operation.resultName);
+        }
+
+        graph.setAttribute("ui.stylesheet", """
+                    node {
+                        text-size: 14px;
+                    }
+                    node.or {
+                        fill-color: orange;
+                    }
+                    node.and {
+                        fill-color: purple;
+                    }
+                    node.xor {
+                        fill-color: yellow;
+                    }
+                    node.marked {
+                        fill-color: red;
+                        text-size: 30px;
+                    }
+                    node.zet {
+                        fill-color: blue;
+                        text-size: 30px;
+                    }
+                """);
+        Viewer display = graph.display();
+    }
+
+    private Graph addToGraph(Graph graph, String f, Operation operation) {
+        if (graph.getNode(f) == null) {
+            Node edges = graph.addNode(f);
+            if (operation instanceof OR) {
+                edges.setAttribute("ui.class", "or");
+            }
+            if (operation instanceof AND) {
+                edges.setAttribute("ui.class", "and");
+            }
+            if (operation instanceof XOR) {
+                edges.setAttribute("ui.class", "xor");
+            }
+
+
+            if (f.startsWith("y")) {
+                edges.setAttribute("ui.class", "zet");
+                edges.setAttribute("ui.label", f);
+            }
+            if (f.startsWith("x")) {
+                edges.setAttribute("ui.class", "zet");
+                edges.setAttribute("ui.label", f);
+            }
+            if (f.startsWith("z")) {
+                edges.setAttribute("ui.class", "marked");
+                edges.setAttribute("ui.label", f);
+            }
+
+            edges.setAttribute("ui.label", f);
+        }
+        return graph;
+    }
+
+    private Long getZOutputWithDifferentInput(String x, String y) {
+        if (x.length() != y.length()) {
+            return 0L;
+        }
+
+        HashMap<String, Integer> variables = createVariables();
+
+        ArrayList<String> xl = new ArrayList<>();
+        ArrayList<String> yl = new ArrayList<>();
+
+        for (String key : variables.keySet()) {
+            if (key.startsWith("x")) {
+                xl.add(key);
+            }
+
+            if (key.startsWith("y")) {
+                yl.add(key);
+            }
+        }
+
+        if (x.length() != xl.size()) {
+            System.out.println("size is fout");
+            return 0L;
+        }
+
+        Collections.sort(xl);
+        Collections.sort(yl);
+
+        for (int i = 0; i < x.length(); i++) {
+            int xc = Integer.parseInt(String.valueOf(x.charAt(i)));
+            int yc = Integer.parseInt(String.valueOf(y.charAt(i)));
+
+            variables.put(xl.get(i), xc);
+            variables.put(yl.get(i), yc);
+        }
+
+        ArrayList<Operation> operations = createOperations(variables);
+        return getZOutput(operations, variables);
+    }
+
+    private HashMap<String, Integer> createVariables() {
         String s = Helper.readToString(2024, 24);
         String[] input = s.split("\n\n");
         String[] setup = input[0].split("\n");
-        String[] operations = input[1].split("\n");
 
         HashMap<String, Integer> variables = new HashMap<>();
 
@@ -97,6 +219,14 @@ public class Day24 {
             String[] split = var.split(": ");
             variables.put(split[0], Integer.parseInt(split[1]));
         }
+
+        return variables;
+    }
+
+    private ArrayList<Operation> createOperations(HashMap<String, Integer> variables) {
+        String s = Helper.readToString(2024, 24);
+        String[] input = s.split("\n\n");
+        String[] operations = input[1].split("\n");
 
         ArrayList<Operation> operationArrayList = new ArrayList<>();
         for (String operation : operations) {
@@ -121,17 +251,21 @@ public class Day24 {
             operationArrayList.add(newOperation);
         }
 
-        while (!operationArrayList.stream().allMatch(Operation::done)) {
-            List<Operation> readies = operationArrayList.stream().filter(Operation::ready).toList();
+        return operationArrayList;
+    }
+
+    private Long getZOutput(ArrayList<Operation> operations, HashMap<String, Integer> variables) {
+        while (!operations.stream().allMatch(Operation::done)) {
+            List<Operation> readies = operations.stream().filter(Operation::ready).toList();
 
             for (Operation ready : readies) {
                 String calculate = ready.calculate();
                 variables.put(calculate, ready.result);
-                operationArrayList.stream()
+                operations.stream()
                     .filter(operation -> operation.getV1Name().equals(calculate))
                     .forEach(operation -> operation.setV1(ready.result));
 
-                operationArrayList.stream()
+                operations.stream()
                     .filter(operation -> operation.getV2Name().equals(calculate))
                     .forEach(operation -> operation.setV2(ready.result));
             }
@@ -148,11 +282,7 @@ public class Day24 {
             z2.append(z1);
         }
 
-        System.out.println(Long.parseLong(z2.reverse().toString(),2));
-    }
-
-    public void puzzleTwo() {
-
+        return Long.parseLong(z2.reverse().toString(),2);
     }
 
     public static void main(String[] args) {

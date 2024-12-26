@@ -153,13 +153,6 @@ public class Day20 {
                 .filter(matrixLocation -> matrixLocation.getValue(matrix) != '#')
                 .collect(Collectors.toCollection(ArrayList::new));
 
-//        ArrayList<MatrixLocation> cheatOptions = Stream.of(
-//                new MatrixLocation(1, 3)
-//        ).collect(Collectors.toCollection(ArrayList::new));
-//        ArrayList<MatrixLocation> validResults = Stream.of(
-//                new MatrixLocation(5, 7)
-//        ).collect(Collectors.toCollection(ArrayList::new));
-
         HashMap<Integer, Boolean> map = new HashMap<>();
 
         for (MatrixLocation l1 : cheatOptions) {
@@ -240,9 +233,6 @@ public class Day20 {
                 int diff = defaultShortest - (fp + sp + (length(cs, ce)));
 
                 if (diff == 76) {
-                    System.out.println(cs);
-                    System.out.println(ce);
-                    System.out.println(diff);
                     printMap(matrixC);
                 }
                 if (am.containsKey(diff)) {
@@ -254,8 +244,8 @@ public class Day20 {
                     c.addAndGet(1);
                 }
             }
-//            i++;
-//            System.out.println(i + "/" + allCheatOptions.size());
+            i++;
+            System.out.println(i + "/" + allCheatOptions.size());
         }
         System.out.println(c.get());
     }
@@ -266,7 +256,7 @@ public class Day20 {
 
     public static void main(String[] args) {
         Day20 day = new Day20();
-//        day.puzzleOne();
-        day.puzzleTwo();
+        day.puzzleOne();
+//        day.puzzleTwo();
     }
 }
