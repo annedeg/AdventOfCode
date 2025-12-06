@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class Helper {
@@ -96,7 +97,10 @@ public class Helper {
     }
 
     public static char[][] toMatrix(ArrayList<String> strings) {
-        char[][] charArray = new char[strings.size()][strings.get(0).length()];
+        int longestString = strings.stream()
+                .sorted(Comparator.comparing(String::length).reversed())
+                .toList().get(0).length();
+        char[][] charArray = new char[strings.size()][longestString];
         int y = 0;
         for (String line : strings) {
             int x = 0;
