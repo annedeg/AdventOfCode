@@ -303,6 +303,18 @@ public class Helper {
         return null;
     }
 
+    public static ArrayList<MatrixLocation> findAllCharsInMap(char[][] map, char c) {
+        ArrayList<MatrixLocation> matrixLocations = new ArrayList<>();
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                if (map[y][x] == c) {
+                    matrixLocations.add(new MatrixLocation(x,y));
+                }
+            }
+        }
+        return matrixLocations;
+    }
+
     public static char[][] deepCopy(char[][] original) {
         if (original == null) {
             return null;

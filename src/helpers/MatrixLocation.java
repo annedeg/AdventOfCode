@@ -47,6 +47,10 @@ public class MatrixLocation {
         return x;
     }
 
+    public long getManhattenDistance(MatrixLocation matrixLocation) {
+        return Math.abs(this.x - matrixLocation.x) + Math.abs(this.y - matrixLocation.y);
+    }
+
     public Direction getDirection() {
         return direction;
     }
