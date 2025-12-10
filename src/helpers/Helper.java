@@ -315,6 +315,14 @@ public class Helper {
         return matrixLocations;
     }
 
+    public static char[] deepCopy(char[] original) {
+        if (original == null) {
+            return null;
+        }
+
+        return Arrays.copyOf(original, original.length);
+    }
+
     public static char[][] deepCopy(char[][] original) {
         if (original == null) {
             return null;
