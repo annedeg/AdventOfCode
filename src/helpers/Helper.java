@@ -323,6 +323,14 @@ public class Helper {
         return Arrays.copyOf(original, original.length);
     }
 
+    public static int[] deepCopy(int[] original) {
+        if (original == null) {
+            return null;
+        }
+
+        return Arrays.copyOf(original, original.length);
+    }
+
     public static char[][] deepCopy(char[][] original) {
         if (original == null) {
             return null;

@@ -1,13 +1,12 @@
 package year_2025;
 
+import com.microsoft.z3.*;
 import helpers.Helper;
-import helpers.MatrixLocation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 
 public class Day10 {
     public void puzzleOne() {
@@ -23,16 +22,16 @@ public class Day10 {
     public void puzzleTwo() {
         int result = Helper.readToStringArrayList(2025, 10).stream()
                 .map(SecondMachinePuzzle::new)
-                .map(SecondMachinePuzzle::solveLowest)
+                .map(SecondMachinePuzzle::solve)
                 .mapToInt(Integer::intValue)
                 .sum();
 
-        System.out.println("1: " + result);
+        System.out.println("2: " + result);
     }
 
     public static void main(String[] args) {
         Day10 day = new Day10();
-        day.puzzleOne();
+//        day.puzzleOne();
         day.puzzleTwo();
     }
 }
@@ -99,13 +98,13 @@ class MachinePuzzle {
 
 class SecondMachinePuzzle {
     int[] desiredState;
-    int currentLowest = Integer.MAX_VALUE;
     ArrayList<Set<Integer>> buttonWiring = new ArrayList<>();
+    HashMap<Integer, ArrayList<IntExpr>> counterToButtons = new HashMap<>();
 
     SecondMachinePuzzle(String inputLine) {
         String[] inputLineSplitted = inputLine.split(" ");
 
-        desiredState = Arrays.stream(inputLineSplitted[inputLineSplitted.length - 1].substring(1, inputLineSplitted[0].length() - 1).split(","))
+        desiredState = Arrays.stream(inputLineSplitted[inputLineSplitted.length - 1].substring(1, inputLineSplitted[inputLineSplitted.length - 1].length() - 1).split(","))
                 .mapToInt(Integer::parseInt)
                 .toArray();
 
@@ -116,37 +115,61 @@ class SecondMachinePuzzle {
         }
     }
 
-    int tryLowest(int[] currentState, Set<Integer> currentTry, ArrayList<Set<Integer>> history) {
-        if (Arrays.equals(currentState, desiredState)) {
-            return history.size();
-        }
+    int solve() {
+        Context context = new Context();
+        Optimize optimize = context.mkOptimize();
+        IntExpr presses = context.mkIntConst("presses");
 
-        for (Integer tryPart : currentTry) {
-            currentState[tryPart]++;
-        }
+        IntExpr[] buttonVars = IntStream.range(0, buttonWiring.size())
+                .mapToObj(i -> context.mkIntConst("button" + i))
+                .toArray(IntExpr[]::new);
 
-        history.add(currentTry);
+        int buttonNum = 0;
+        for (Set<Integer> wiring : buttonWiring) {
+            IntExpr buttonVar = buttonVars[buttonNum];
 
-        for (Set<Integer> possibleTry : buttonWiring) {
-            int tryLowest = tryLowest(currentState, possibleTry, history);
-
-            if (tryLowest < currentLowest) {
-                currentLowest = tryLowest;
+            for (Integer wire : wiring) {
+                if (!counterToButtons.containsKey(wire)) {
+                    counterToButtons.put(wire, new ArrayList<>());
+                }
+                counterToButtons.get(wire).add(buttonVar);
             }
+            buttonNum++;
         }
 
-        return Integer.MAX_VALUE;
-    }
+        for (Map.Entry<Integer, ArrayList<IntExpr>> entry : counterToButtons.entrySet()) {
+            int index = entry.getKey();
+            ArrayList<IntExpr> counterButtons = entry.getValue();
 
-    int solveLowest() {
-        for (Set<Integer> startMove : buttonWiring) {
-            int[] initialState = new int[desiredState.length];
-            for (int i = 0; i < desiredState.length; i++) {
-                initialState[i] =  0;
-            }
-            tryLowest(initialState, startMove, new ArrayList<>());
+            IntExpr target = context.mkInt(desiredState[index]);
+
+            IntExpr[] buttonPressesArray = counterButtons.toArray(new IntExpr[0]);
+            IntExpr sum = (IntExpr) context.mkAdd(buttonPressesArray);
+
+            BoolExpr eq = context.mkEq(target, sum);
+            optimize.Add(eq);
         }
 
-        return this.currentLowest;
+        IntNum zero = context.mkInt(0);
+        for (IntExpr but : buttonVars) {
+            BoolExpr eq = context.mkGe(but, zero);
+            optimize.Add(eq);
+        }
+
+        IntExpr sumOfAllButtonVars = (IntExpr) context.mkAdd(buttonVars);
+        BoolExpr totalPressesEq = context.mkEq(presses, sumOfAllButtonVars);
+        optimize.Add(totalPressesEq);
+
+        optimize.MkMinimize(presses);
+
+        Status status = optimize.Check();
+
+        if (status == Status.SATISFIABLE) {
+            Model model = optimize.getModel();
+            IntNum outputValue = (IntNum) model.evaluate(presses, false);
+            return outputValue.getInt();
+        }
+
+        return -1000;
     }
 }

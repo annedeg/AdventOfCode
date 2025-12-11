@@ -4,6 +4,8 @@ import helpers.Helper;
 import helpers.MatrixLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Day9 {
@@ -31,12 +33,35 @@ public class Day9 {
     }
 
     public void puzzleTwo() {
+        ArrayList<MatrixLocation> matrixLocs = Helper.readToStringArrayList(2025, 9).stream()
+                .map(str -> {
+                    String[] split = str.split(",");
+                    return new MatrixLocation(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
 
+        HashMap<Set<MatrixLocation>, Long> bestLocations = new HashMap<>();
+        for (MatrixLocation m1 : matrixLocs) {
+            for (MatrixLocation m2 : matrixLocs) {
+                if (m1.equals(m2)) {
+                    continue;
+                }
+
+                long res = ((long)Math.abs(m1.x - m2.getX()) + 1) * (Math.abs(m1.y - m2.getY()) + 1);
+                bestLocations.put(Set.of(m1,m2), res);
+            }
+        }
+
+        System.out.println("f");
+    }
+
+    public boolean pointIsInsideFigure(ArrayList<MatrixLocation> allPoints, MatrixLocation singlePoint) {
+        return false;
     }
 
     public static void main(String[] args) {
         Day9 day = new Day9();
-        day.puzzleOne();
+//        day.puzzleOne();
         day.puzzleTwo();
     }
 }
